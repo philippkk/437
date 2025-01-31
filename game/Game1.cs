@@ -7,6 +7,7 @@ namespace game;
 public class Game1 : Game
 {
         Texture2D ballTexture;
+                Texture2D ballTexture2;
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
@@ -33,6 +34,7 @@ public class Game1 : Game
 
     // TODO: use this.Content to load your game content here
     ballTexture = Content.Load<Texture2D>("omg");
+    ballTexture2 = Content.Load<Texture2D>("thing");
 
         // TODO: use this.Content to load your game content here
     }
@@ -49,11 +51,12 @@ public class Game1 : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(Color.Black);
+        GraphicsDevice.Clear(Color.Lavender);
 
         // TODO: Add your drawing code here
            _spriteBatch.Begin();
     _spriteBatch.Draw(ballTexture, new Vector2(0, 0), Color.White);
+    _spriteBatch.Draw(ballTexture2, new Vector2(0, 0), Color.White);
     _spriteBatch.End();
 
 

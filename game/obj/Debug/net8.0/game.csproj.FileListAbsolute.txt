@@ -24,5 +24,6 @@
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/game.pdb
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/game.genruntimeconfig.cache
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/ref/game.dll
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/omg.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing2.xnb

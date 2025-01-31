@@ -6,8 +6,10 @@
   <SourceFiles>
     <File>/Users/philipking/Desktop/437/game/Content/omg.png</File>
     <File>/Users/philipking/Desktop/437/game/Content/thing.png</File>
+    <File>/Users/philipking/Desktop/437/game/Content/thing2.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
