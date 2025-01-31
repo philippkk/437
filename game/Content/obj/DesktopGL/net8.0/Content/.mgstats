@@ -1,0 +1,3 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/Users/philipking/Desktop/437/game/Content/omg.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/omg.xnb","TextureProcessor","Texture2DContent",325935,768325,0.140756
+"/Users/philipking/Desktop/437/game/Content/thing.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/thing.xnb","TextureProcessor","Texture2DContent",10774,76117,0.124
