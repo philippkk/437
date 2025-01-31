@@ -3,3 +3,15 @@ hi
 video game class projects will be stored here
 
 good luck getting them to run
+
+steps to dev on m1/2/3 mac
+
+1. download both arm and x64 dot net
+2. add x64 dot net to path
+3. open vs code
+4. open mgcb through vs code
+5. should be able to rebuild content
+6. replace x64 with arm version of dot net in path
+7. restart c# dev tools in vs code
+8. in terminal run `dotnet run` to build game
+8. mgcb editor should still work : )
