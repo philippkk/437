@@ -23,6 +23,15 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+  <Reference Include="BEPUphysics">
+      <HintPath>Dependencies\BEPUphysics.dll</HintPath>
+    </Reference>
+    <Reference Include="BEPUutilities">
+      <HintPath>Dependencies\BEPUutilities.dll</HintPath>
+    </Reference>
+    <Reference Include="ConversionHelper">
+      <HintPath>Dependencies\ConversionHelper.dll</HintPath>
+    </Reference>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
     <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
   </ItemGroup>

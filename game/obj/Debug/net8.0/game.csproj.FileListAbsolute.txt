@@ -24,6 +24,13 @@
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/game.pdb
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/game.genruntimeconfig.cache
 /Users/philipking/Desktop/437/game/obj/Debug/net8.0/ref/game.dll
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/omg.xnb
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing.xnb
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing2.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/BEPUphysics.dll
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/BEPUutilities.dll
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/ConversionHelper.dll
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/BEPUphysics.xml
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/BEPUutilities.xml
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/ConversionHelper.xml
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/playground.fbx.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal_0.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Ship2.xnb
