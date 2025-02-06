@@ -15,3 +15,6 @@ steps to dev on m1/2/3 mac
 7. restart c# dev tools in vs code
 8. in terminal run `dotnet run` to build game
 8. mgcb editor should still work : )
+
+update:
+actually just stay on x64 dotnet and it seems to just work idk
