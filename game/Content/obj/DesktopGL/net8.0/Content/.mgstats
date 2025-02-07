@@ -1,3 +1,5 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"/Users/philipking/Desktop/437/game/Content/cube.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/cube.xnb","ModelProcessor","ModelContent",15264,1501,0.153841
 "/Users/philipking/Desktop/437/game/Content/metal.jpg","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/metal_0.xnb","TextureProcessor","Texture2DContent",13099,174897,0.16526
+"/Users/philipking/Desktop/437/game/Content/playground.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/playground.xnb","ModelProcessor","ModelContent",594784,379727,0.069603
 "/Users/philipking/Desktop/437/game/Content/Ship2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Ship2.xnb","ModelProcessor","ModelContent",27132,13026,0.173597

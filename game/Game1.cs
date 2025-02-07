@@ -119,7 +119,7 @@ namespace game
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            CubeModel = Content.Load<Model>("ship2");
+            CubeModel = Content.Load<Model>("playground");
         }
 
         protected override void UnloadContent()

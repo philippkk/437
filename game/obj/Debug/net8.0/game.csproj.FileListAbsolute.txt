@@ -34,3 +34,5 @@
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal_0.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Ship2.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/cube.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/playground.xnb

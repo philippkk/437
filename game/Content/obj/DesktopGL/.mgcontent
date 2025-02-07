@@ -4,10 +4,14 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>/Users/philipking/Desktop/437/game/Content/cube.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/metal.jpg</File>
+    <File>/Users/philipking/Desktop/437/game/Content/playground.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/Ship2.fbx</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
