@@ -127,17 +127,17 @@ namespace game
             float distance = Speed * dt;
 
             //Scoot the camera around depending on what keys are pressed.
-            if (Game.KeyboardState.IsKeyDown(Keys.E))
+            if (Game.KeyboardState.IsKeyDown(Keys.W))
                 MoveForward(distance);
-            if (Game.KeyboardState.IsKeyDown(Keys.D))
-                MoveForward(-distance);
             if (Game.KeyboardState.IsKeyDown(Keys.S))
-                MoveRight(-distance);
-            if (Game.KeyboardState.IsKeyDown(Keys.F))
-                MoveRight(distance);
+                MoveForward(-distance);
             if (Game.KeyboardState.IsKeyDown(Keys.A))
+                MoveRight(-distance);
+            if (Game.KeyboardState.IsKeyDown(Keys.D))
+                MoveRight(distance);
+            if (Game.KeyboardState.IsKeyDown(Keys.E))
                 MoveUp(distance);
-            if (Game.KeyboardState.IsKeyDown(Keys.Z))
+            if (Game.KeyboardState.IsKeyDown(Keys.Q))
                 MoveUp(-distance);
 
             WorldMatrix = WorldMatrix * Matrix.CreateTranslation(Position);

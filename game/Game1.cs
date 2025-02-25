@@ -119,7 +119,7 @@ namespace game
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            CubeModel = Content.Load<Model>("playground");
+            CubeModel = Content.Load<Model>("ship2");
         }
 
         protected override void UnloadContent()
@@ -203,8 +203,6 @@ namespace game
             base.Draw(gameTime);
         }
     }
-
-
 
 }
 

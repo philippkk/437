@@ -1,5 +1,10 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
 "/Users/philipking/Desktop/437/game/Content/cube.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/cube.xnb","ModelProcessor","ModelContent",15264,1501,0.153841
+"/Users/philipking/Desktop/437/game/Content/golfball.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/golfball.xnb","ModelProcessor","ModelContent",27788,20144,0.16145
+"/Users/philipking/Desktop/437/game/Content/map1.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/map1.xnb","ModelProcessor","ModelContent",31836,37974,0.171061
 "/Users/philipking/Desktop/437/game/Content/metal.jpg","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/metal_0.xnb","TextureProcessor","Texture2DContent",13099,174897,0.16526
+"/Users/philipking/Desktop/437/game/Content/pallet1.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/pallet1_0.xnb","TextureProcessor","Texture2DContent",52306,7470429,1.068342
 "/Users/philipking/Desktop/437/game/Content/playground.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/playground.xnb","ModelProcessor","ModelContent",594784,379727,0.069603
+"/Users/philipking/Desktop/437/game/Content/Screenshot 2025-02-24 at 1.20.14 PM.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Screenshot 2025-02-24 at 1.20.14 PM_0.xnb","TextureProcessor","Texture2DContent",911757,10085601,1.439469
 "/Users/philipking/Desktop/437/game/Content/Ship2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Ship2.xnb","ModelProcessor","ModelContent",27132,13026,0.173597
+"/Users/philipking/Desktop/437/game/Content/thing.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/thing.xnb","ModelProcessor","ModelContent",21964,2698,1.547678
