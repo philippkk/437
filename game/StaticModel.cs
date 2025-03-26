@@ -25,7 +25,7 @@ namespace game
         /// <param name="model">Graphical representation to use for the entity.</param>
         /// <param name="transform">Base transformation to apply to the model before moving to the entity.</param>
         /// <param name="game">Game to which this component will belong.</param>
-        public StaticModel(Model model, Matrix transform, Game game)
+        public StaticModel(Model model, Matrix transform, Microsoft.Xna.Framework.Game game)
             : base(game)
         {
             this.model = model;
@@ -51,8 +51,8 @@ namespace game
                 foreach (BasicEffect effect in mesh.Effects)
                 {
                     effect.World = boneTransforms[mesh.ParentBone.Index] * MathConverter.Convert(Transform);
-                    effect.View = MathConverter.Convert((Game as GettingStartedGame).Camera.ViewMatrix);
-                    effect.Projection = MathConverter.Convert((Game as GettingStartedGame).Camera.ProjectionMatrix);
+                    effect.View = MathConverter.Convert((Game as Game).Camera.ViewMatrix);
+                    effect.Projection = MathConverter.Convert((Game as Game).Camera.ProjectionMatrix);
                 }
                 mesh.Draw();
             }

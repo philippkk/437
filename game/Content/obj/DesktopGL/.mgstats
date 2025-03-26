@@ -1,10 +1,12 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"/Users/philipking/Desktop/437/game/Content/cube.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/cube.xnb","ModelProcessor","ModelContent",15264,1501,0.146158
-"/Users/philipking/Desktop/437/game/Content/golfball.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/golfball.xnb","ModelProcessor","ModelContent",27788,20144,0.021001
-"/Users/philipking/Desktop/437/game/Content/map1.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/map1.xnb","ModelProcessor","ModelContent",31836,37974,1.009746
-"/Users/philipking/Desktop/437/game/Content/metal.jpg","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/metal_0.xnb","TextureProcessor","Texture2DContent",13099,174897,0.154964
-"/Users/philipking/Desktop/437/game/Content/pallet1.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/pallet1.xnb","TextureProcessor","Texture2DContent",52306,5606673,0.241898
-"/Users/philipking/Desktop/437/game/Content/playground.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/playground.xnb","ModelProcessor","ModelContent",594784,379727,0.055874
-"/Users/philipking/Desktop/437/game/Content/Screenshot 2025-02-24 at 1.20.14 PM.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Screenshot 2025-02-24 at 1.20.14 PM_0.xnb","TextureProcessor","Texture2DContent",911757,10085601,1.142368
-"/Users/philipking/Desktop/437/game/Content/Ship2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Ship2.xnb","ModelProcessor","ModelContent",27132,13026,0.159984
-"/Users/philipking/Desktop/437/game/Content/thing.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/thing.xnb","ModelProcessor","ModelContent",21964,2698,1.149708
+"/Users/philipking/Desktop/437/game/Content/../../models/golfball2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/golfball2.xnb","ModelProcessor","ModelContent",179468,549952,0.247676
+"/Users/philipking/Desktop/437/game/Content/../../models/golfball3.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/golfball3.xnb","ModelProcessor","ModelContent",36828,33542,0.014886
+"/Users/philipking/Desktop/437/game/Content/cube.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/cube.xnb","ModelProcessor","ModelContent",15264,1501,0.004481
+"/Users/philipking/Desktop/437/game/Content/golfball.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/golfball.xnb","ModelProcessor","ModelContent",27788,20144,0.007656
+"/Users/philipking/Desktop/437/game/Content/map1.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/map1.xnb","ModelProcessor","ModelContent",31836,37974,1.09819
+"/Users/philipking/Desktop/437/game/Content/metal.jpg","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/metal_0.xnb","TextureProcessor","Texture2DContent",13099,174897,0.213674
+"/Users/philipking/Desktop/437/game/Content/pallet1.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/pallet1.xnb","TextureProcessor","Texture2DContent",52306,5606673,0.201528
+"/Users/philipking/Desktop/437/game/Content/playground.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/playground.xnb","ModelProcessor","ModelContent",594784,379727,0.053925
+"/Users/philipking/Desktop/437/game/Content/Screenshot 2025-02-24 at 1.20.14 PM.png","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Screenshot 2025-02-24 at 1.20.14 PM_0.xnb","TextureProcessor","Texture2DContent",911757,10085601,1.174394
+"/Users/philipking/Desktop/437/game/Content/Ship2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Ship2.xnb","ModelProcessor","ModelContent",27132,13026,0.222435
+"/Users/philipking/Desktop/437/game/Content/thing.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/thing.xnb","ModelProcessor","ModelContent",21964,2698,1.182722
