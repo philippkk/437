@@ -1,0 +1,36 @@
+public static class VectorMatrixConverter
+{
+    // Convert BEPUutilities Vector3 to XNA Vector3
+    public static Microsoft.Xna.Framework.Vector3 ToXnaVector3(this BEPUutilities.Vector3 vector)
+    {
+        return new Microsoft.Xna.Framework.Vector3(vector.X, vector.Y, vector.Z);
+    }
+
+    // Convert XNA Vector3 to BEPUutilities Vector3
+    public static BEPUutilities.Vector3 ToBepuVector3(this Microsoft.Xna.Framework.Vector3 vector)
+    {
+        return new BEPUutilities.Vector3(vector.X, vector.Y, vector.Z);
+    }
+
+    // Convert BEPUutilities Matrix to XNA Matrix
+    public static Microsoft.Xna.Framework.Matrix ToXnaMatrix(this BEPUutilities.Matrix matrix)
+    {
+        return new Microsoft.Xna.Framework.Matrix(
+            matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+            matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+            matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+            matrix.M41, matrix.M42, matrix.M43, matrix.M44
+        );
+    }
+
+    // Convert XNA Matrix to BEPUutilities Matrix
+    public static BEPUutilities.Matrix ToBepuMatrix(this Microsoft.Xna.Framework.Matrix matrix)
+    {
+        return new BEPUutilities.Matrix(
+            matrix.M11, matrix.M12, matrix.M13, matrix.M14,
+            matrix.M21, matrix.M22, matrix.M23, matrix.M24,
+            matrix.M31, matrix.M32, matrix.M33, matrix.M34,
+            matrix.M41, matrix.M42, matrix.M43, matrix.M44
+        );
+    }
+}
