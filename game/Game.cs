@@ -139,20 +139,26 @@ namespace game
 
             base.Draw(gameTime);
 
-            // Draw crosshair
+           
+            drawCroshair();
+            drawStrokeText();
+        }
+
+        void drawCroshair(){
+            if(!Camera.isOrbiting)
+            {
             spriteBatch.Begin();
             spriteBatch.Draw(crosshairTexture, 
                 new XNAVector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), 
                 null, 
-                new Color(128, 128, 128, 128), // Semi-transparent gray
+                new Color(128, 128, 128, 128), 
                 0f, 
-                new XNAVector2(0.5f, 0.5f), // Center of the dot
-                4f, // Size of the dot
+                new XNAVector2(0.5f, 0.5f), 
+                4f, 
                 SpriteEffects.None, 
                 0f);
             spriteBatch.End();
-
-            drawStrokeText();
+            }
         }
 
         void drawStrokeText()

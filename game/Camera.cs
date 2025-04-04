@@ -14,7 +14,7 @@ namespace game
 
         private Func<Vector3> getTargetPosition;
         private float orbitRadius;
-        private bool isOrbiting;
+        public bool isOrbiting { get; set; }
         private bool lastFrameFPressed;
         private Vector3 orbitOffset;
 
