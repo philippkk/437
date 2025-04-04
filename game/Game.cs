@@ -27,7 +27,8 @@ namespace game
         Space space;
         public Camera Camera;
         public Model GolfBallModel;
-        public Model PlaygroundModel;
+        public Model Map1;
+        public Model Map1teearea;
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
@@ -56,7 +57,10 @@ namespace game
         protected override void LoadContent()
         {
             GolfBallModel = Content.Load<Model>("golfball3");
-            PlaygroundModel = Content.Load<Model>("map1");
+            Map1 = Content.Load<Model>("map1");
+            Map1teearea = Content.Load<Model>("map1teearea");
+
+
 
             space = new Space();
             space.ForceUpdater.Gravity = new Vector3(0, -15.00f, 0);
@@ -113,6 +117,7 @@ namespace game
             if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
             {
                 clicking = true;
+                numStrokes++;
                 golfBall.SpawnBall();
                 numBalls++;
             }
@@ -131,11 +136,17 @@ namespace game
 
             base.Draw(gameTime);
 
+            drawStrokeText();
+
+        }
+
+        void drawStrokeText()
+        {
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
             GraphicsDevice.DepthStencilState = DepthStencilState.None;
             GraphicsDevice.SamplerStates[0] = SamplerState.LinearClamp;
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, 
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
                             SamplerState.PointClamp, null, null, null, null);
             string strokeText = $"Strokes: {numStrokes}";
             XNAVector2 textSize = font.MeasureString(strokeText);
@@ -144,4 +155,5 @@ namespace game
             spriteBatch.End();
         }
     }
+
 }
