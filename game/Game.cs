@@ -35,6 +35,7 @@ namespace game
         private GolfCourse golfCourse;
         private SpriteBatch spriteBatch;
         private SpriteFont font;
+        private Texture2D crosshairTexture;
 
         public int numBalls = 0;
         public int numStrokes = 0;
@@ -60,7 +61,9 @@ namespace game
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
 
-
+            // Create a 1x1 white texture for the crosshair
+            crosshairTexture = new Texture2D(GraphicsDevice, 1, 1);
+            crosshairTexture.SetData(new[] { Color.Black });
 
             space = new Space();
             space.ForceUpdater.Gravity = new Vector3(0, -15.00f, 0);
@@ -136,8 +139,20 @@ namespace game
 
             base.Draw(gameTime);
 
-            drawStrokeText();
+            // Draw crosshair
+            spriteBatch.Begin();
+            spriteBatch.Draw(crosshairTexture, 
+                new XNAVector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), 
+                null, 
+                new Color(128, 128, 128, 128), // Semi-transparent gray
+                0f, 
+                new XNAVector2(0.5f, 0.5f), // Center of the dot
+                4f, // Size of the dot
+                SpriteEffects.None, 
+                0f);
+            spriteBatch.End();
 
+            drawStrokeText();
         }
 
         void drawStrokeText()
