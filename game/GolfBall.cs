@@ -20,16 +20,18 @@ namespace game
         private Camera camera;
         private Space space;
         private Sphere ballEntity;
+        private GolfCourse golfCourse;
 
         public GolfBall(Game game, Camera camera, Space space)
         {
             Game = game;
             this.camera = camera;
             this.space = space;
+            this.golfCourse = game.golfCourse;
             Model = game.GolfBallModel;
         }
 
-        public void SpawnBall()
+        public bool SpawnBall()
         {
             // Create a ray from camera position in the direction of the crosshair
             Vector3 rayStart = camera.Position;
@@ -40,7 +42,7 @@ namespace game
             BEPUphysics.RayCastResult raycastResult;
             bool hit = space.RayCast(ray, (entry) => true, out raycastResult);
 
-            if (hit)
+            if (hit && raycastResult.HitObject == golfCourse.TeeAreaMesh)
             {
                 // Calculate the spawn position slightly above the hit point
                 Vector3 spawnPosition = rayStart + rayDirection * raycastResult.HitData.T + new Vector3(0, 1, 0);
@@ -63,7 +65,11 @@ namespace game
                 EntityModel model = new EntityModel(ballEntity, Model, Matrix.Identity, Game);
                 Game.Components.Add(model);
                 ballEntity.Tag = model;
+
+                return true;
             }
+
+            return false;
         }
 
         public void DeleteBall()

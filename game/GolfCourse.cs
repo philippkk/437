@@ -12,6 +12,7 @@ namespace game
         private Space space;
         private Model courseModel;
         private Model teeareaModel;
+        public StaticMesh TeeAreaMesh { get; private set; }  // Add this line to expose the tee area mesh
 
         public GolfCourse(Game game, Space space)
         {
@@ -31,13 +32,12 @@ namespace game
 
             Material courseMaterial = new Material
             {
-            Bounciness = 0.3f,
-            KineticFriction = 1f,
-            StaticFriction = 1f
+                Bounciness = 0.3f,
+                KineticFriction = 1f,
+                StaticFriction = 1f
             };
 
             courseMesh.Material = courseMaterial;
-
             space.Add(courseMesh);
             Game.Components.Add(new StaticModel(courseModel, courseMesh.WorldTransform.Matrix, Game));
 
@@ -45,19 +45,18 @@ namespace game
             Vector3[] teeVertices;
             int[] teeIndices;
             ModelDataExtractor.GetVerticesAndIndicesFromModel(teeareaModel, out teeVertices, out teeIndices);
-            var teeMesh = new StaticMesh(teeVertices, teeIndices, new AffineTransform(new Vector3(0, -40, 0)));
+            TeeAreaMesh = new StaticMesh(teeVertices, teeIndices, new AffineTransform(new Vector3(0, -40, 0)));
 
             Material teeMaterial = new Material
             {
-            Bounciness = 0.3f,
-            KineticFriction = 1f,
-            StaticFriction = 1f
+                Bounciness = 0.3f,
+                KineticFriction = 1f,
+                StaticFriction = 1f
             };
 
-            teeMesh.Material = teeMaterial;
-
-            space.Add(teeMesh);
-            Game.Components.Add(new StaticModel(teeareaModel, teeMesh.WorldTransform.Matrix, Game));
+            TeeAreaMesh.Material = teeMaterial;
+            space.Add(TeeAreaMesh);
+            Game.Components.Add(new StaticModel(teeareaModel, TeeAreaMesh.WorldTransform.Matrix, Game));
         }
     }
 }

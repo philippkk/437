@@ -32,7 +32,7 @@ namespace game
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
-        private GolfCourse golfCourse;
+        public GolfCourse golfCourse { get; private set; }
         private SpriteBatch spriteBatch;
         private SpriteFont font;
         private Texture2D crosshairTexture;
@@ -129,9 +129,10 @@ namespace game
             if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
             {
                 clicking = true;
-                numStrokes++;
-                golfBall.SpawnBall();
-                numBalls++;
+                if (golfBall.SpawnBall()){
+                    numStrokes++;
+                    numBalls++;
+                }
             }
 
             space.Update();
