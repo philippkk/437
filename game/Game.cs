@@ -114,6 +114,7 @@ namespace game
             {
                 if (numBalls > 0)
                 {
+                    Camera.isOrbiting = false;
                     golfBall.DeleteBall();
                     numBalls = 0;
                 }
@@ -126,13 +127,21 @@ namespace game
                 clicking = false;
             }
 
-            if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
+            if (Camera.isOrbiting)
+            {
+                if (MouseState.LeftButton == ButtonState.Pressed && !clicking)
+                {
+                    clicking = true;
+                    numStrokes++;
+                    golfBall.ApplyForce(Camera.WorldMatrix.Forward);
+                }
+            }
+            else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
             {
                 clicking = true;
-                if (golfBall.SpawnBall()){
-                    numStrokes++;
-                    numBalls++;
-                }
+                numStrokes++;
+                golfBall.SpawnBall();
+                numBalls++;
             }
 
             space.Update();

@@ -82,6 +82,24 @@ namespace game
             }
         }
 
+        public void ApplyForce(Vector3 direction)
+        {
+            if (ballEntity != null)
+            {
+                // Normalize the direction vector
+                direction.Normalize();
+                
+                // Add a slight upward component to prevent ground shooting
+                Vector3 upwardBias = new Vector3(0, 0.3f, 0);
+                Vector3 adjustedDirection = direction + upwardBias;
+                adjustedDirection.Normalize();
+
+                // Apply the force - adjust the multiplier to control shot strength
+                float forceMagnitude = 30f;
+                ballEntity.LinearVelocity = adjustedDirection * forceMagnitude;
+            }
+        }
+
         public void Update(float dt)
         {
         }
