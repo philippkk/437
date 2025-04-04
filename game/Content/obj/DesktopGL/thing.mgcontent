@@ -3,7 +3,7 @@
   <SourceFile>/Users/philipking/Desktop/437/game/Content/thing.fbx</SourceFile>
   <SourceTime>2025-02-24T22:31:52.936546-06:00</SourceTime>
   <DestFile>/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/thing.xnb</DestFile>
-  <DestTime>2025-04-04T14:13:10.5247371-05:00</DestTime>
+  <DestTime>2025-04-04T14:45:38.3747878-05:00</DestTime>
   <Importer>FbxImporter</Importer>
   <ImporterTime>2022-07-26T06:44:56-05:00</ImporterTime>
   <Processor>ModelProcessor</Processor>

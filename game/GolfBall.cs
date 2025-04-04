@@ -6,6 +6,8 @@ using BEPUphysics;
 using BEPUphysics.Entities;
 using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Materials;
+using BEPUphysics.CollisionRuleManagement;
+using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 
 namespace game
 {
@@ -29,32 +31,49 @@ namespace game
 
         public void SpawnBall()
         {
-            ballEntity = new Sphere(camera.Position + new Vector3(0, -5, 0), 1, 1);
-            camera.SetTarget(ballEntity);
+            // Create a ray from camera position in the direction of the crosshair
+            Vector3 rayStart = camera.Position;
+            Vector3 rayDirection = camera.WorldMatrix.Forward;
+            
+            // Find the first object the ray intersects with
+            BEPUutilities.Ray ray = new BEPUutilities.Ray(rayStart, rayDirection);
+            BEPUphysics.RayCastResult raycastResult;
+            bool hit = space.RayCast(ray, (entry) => true, out raycastResult);
 
-            float max = 0.2f;
-            float min = 0;
-            Random random = new Random();
-            Vector3 offset = new Vector3(
-                (float)(random.NextDouble() * (max - min) + min),
-                (float)(random.NextDouble() * (max - min) + min),
-                (float)(random.NextDouble() * (max - min) + min)
-            );
-
-            Material mat = new Material
+            if (hit)
             {
-                Bounciness = 1.0f,
-                KineticFriction = 1f,
-                StaticFriction = 1f
-            };
-            ballEntity.Material = mat;
+                // Calculate the spawn position slightly above the hit point
+                Vector3 spawnPosition = rayStart + rayDirection * raycastResult.HitData.T + new Vector3(0, 1, 0);
+                
+                ballEntity = new Sphere(spawnPosition, 1, 1);
+                camera.SetTarget(ballEntity);
 
-            ballEntity.LinearVelocity = (camera.WorldMatrix.Forward + offset) * 60;
-            space.Add(ballEntity);
+                Material mat = new Material
+                {
+                    Bounciness = 1.0f,
+                    KineticFriction = 1f,
+                    StaticFriction = 1f
+                };
+                ballEntity.Material = mat;
 
-            EntityModel model = new EntityModel(ballEntity, Model, Matrix.Identity, Game);
-            Game.Components.Add(model);
-            ballEntity.Tag = model;
+                // No initial velocity when spawning at crosshair
+                ballEntity.LinearVelocity = new Vector3();
+                space.Add(ballEntity);
+
+                EntityModel model = new EntityModel(ballEntity, Model, Matrix.Identity, Game);
+                Game.Components.Add(model);
+                ballEntity.Tag = model;
+            }
+        }
+
+        public void DeleteBall()
+        {
+            if (ballEntity != null)
+            {
+                space.Remove(ballEntity);
+                Game.Components.Remove((EntityModel)ballEntity.Tag);
+                ballEntity = null;
+            }
         }
 
         public void Update(float dt)

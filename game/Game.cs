@@ -110,6 +110,15 @@ namespace game
                 return;
             }
 
+            if (KeyboardState.IsKeyDown(Keys.R))
+            {
+                if (numBalls > 0)
+                {
+                    golfBall.DeleteBall();
+                    numBalls = 0;
+                }
+            }
+
             Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
             if (MouseState.LeftButton == ButtonState.Released)
