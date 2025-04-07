@@ -19,9 +19,10 @@ using System.Runtime.InteropServices;
     todo: model, use Z forward Y up
 
     whats left:
-    - proper ball hit logic
+    - proper ball hit logic, done
     - cup logic
-    - gui
+    - gui, done
+    - main menu
     - other maps
     - keeping top three scores
     - two player mode
@@ -46,7 +47,7 @@ namespace game
         private SpriteBatch spriteBatch;
         private SpriteFont font;
         private Texture2D crosshairTexture;
-        private Texture2D powerBarTexture;  // Added for power bar
+        private Texture2D powerBarTexture; 
 
         public int numBalls = 0;
         public int numStrokes = 0;
@@ -108,7 +109,7 @@ namespace game
 
         protected override void UnloadContent()
         {
-
+            // lol
         }
 
 
@@ -166,13 +167,12 @@ namespace game
 
             base.Draw(gameTime);
             
-            // Add trajectory line drawing before UI elements
             golfBall.Draw();
            
             drawCroshair();
-            drawPowerBar();  // Add power bar drawing
+            drawPowerBar();  
             drawStrokeText();
-            drawControls();  // Add the new controls display
+            drawControls();  
         }
 
         void drawCroshair(){
@@ -201,27 +201,23 @@ namespace game
                 
                 spriteBatch.Begin();
                 
-                // Draw background (gray bar)
                 int barWidth = 200;
                 int barHeight = 20;
                 int barX = GraphicsDevice.Viewport.Width / 2 - barWidth / 2;
                 int barY = GraphicsDevice.Viewport.Height - 50;
 
-                // Draw angle text centered above the bar
                 string angleText = $"{golfBall.CurrentAngle:F0}°";
                 XNAVector2 textSize = font.MeasureString(angleText);
                 XNAVector2 anglePosition = new XNAVector2(
-                    barX + (barWidth / 2) - (textSize.X / 2),  // Center text above bar
-                    barY - textSize.Y - 5  // Position text above bar with 5px padding
+                    barX + (barWidth / 2) - (textSize.X / 2), 
+                    barY - textSize.Y - 5  
                 );
                 spriteBatch.DrawString(font, angleText, anglePosition, Color.Black);
                 
-                // Draw the power bar
                 spriteBatch.Draw(powerBarTexture,
                     new Rectangle(barX, barY, barWidth, barHeight),
                     Color.DarkGray);
 
-                // Draw power level (colored bar)
                 float powerPercent = golfBall.CurrentPowerPercent;
                 int fillWidth = (int)(barWidth * powerPercent);
                 
@@ -268,14 +264,12 @@ namespace game
                 int lineSpacing = 5;
                 float maxWidth = 0;
                 
-                // First pass to find the widest line
                 foreach (string line in controls)
                 {
                     XNAVector2 size = font.MeasureString(line);
                     maxWidth = Math.Max(maxWidth, size.X);
                 }
 
-                // Draw each line from bottom to top
                 float currentY = GraphicsDevice.Viewport.Height - padding - (controls.Length * (font.LineSpacing + lineSpacing));
                 foreach (string line in controls)
                 {

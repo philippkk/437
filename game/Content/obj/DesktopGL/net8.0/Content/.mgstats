@@ -1,7 +1,7 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
 "/Users/philipking/Desktop/437/game/Content/../../models/golfball2.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/golfball2.xnb","ModelProcessor","ModelContent",179468,549952,0.272443
 "/Users/philipking/Desktop/437/game/Content/../../models/golfball3.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/golfball3.xnb","ModelProcessor","ModelContent",36828,33542,0.167086
-"/Users/philipking/Desktop/437/game/Content/Arial.spritefont","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Arial.xnb","FontDescriptionProcessor","SpriteFontContent",592,70733,0.212196
+"/Users/philipking/Desktop/437/game/Content/Arial.spritefont","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Arial.xnb","FontDescriptionProcessor","SpriteFontContent",592,70733,0.209941
 "/Users/philipking/Desktop/437/game/Content/cube.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/cube.xnb","ModelProcessor","ModelContent",15264,1501,0.153841
 "/Users/philipking/Desktop/437/game/Content/golfball.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/golfball.xnb","ModelProcessor","ModelContent",27788,20144,0.16145
 "/Users/philipking/Desktop/437/game/Content/map1.fbx","/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/map1.xnb","ModelProcessor","ModelContent",31836,37974,0.171061

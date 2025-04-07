@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <SourceFile>/Users/philipking/Desktop/437/game/Content/Arial.spritefont</SourceFile>
-  <SourceTime>2025-04-06T23:40:20.3961128-05:00</SourceTime>
+  <SourceTime>2025-04-06T23:47:28.2199624-05:00</SourceTime>
   <DestFile>/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/Content/Arial.xnb</DestFile>
-  <DestTime>2025-04-06T23:40:34.0519648-05:00</DestTime>
+  <DestTime>2025-04-06T23:49:01.2340132-05:00</DestTime>
   <Importer>FontDescriptionImporter</Importer>
   <ImporterTime>2022-07-26T06:44:56-05:00</ImporterTime>
   <Processor>FontDescriptionProcessor</Processor>

@@ -65,7 +65,6 @@ namespace game
 
                 if (isOrbiting)
                 {
-                    // Recalculate offset when entering orbit mode
                     Vector3 targetPosition = getTargetPosition();
                     orbitOffset = Position - targetPosition;
                     orbitRadius = orbitOffset.Length();
@@ -78,19 +77,16 @@ namespace game
             {
                 Vector3 targetPosition = getTargetPosition();
 
-                // Update yaw and pitch based on mouse movement
                 Yaw += (200 - Game.MouseState.X) * dt * .12f;
                 Pitch += (200 - Game.MouseState.Y) * dt * .12f;
                 Mouse.SetPosition(200, 200);
 
-                // Calculate the new orbit position using spherical coordinates
                 float x = orbitRadius * (float)Math.Sin(MathHelper.PiOver2 + Pitch) * (float)Math.Sin(Yaw);
                 float y = orbitRadius * (float)Math.Cos(MathHelper.PiOver2 + Pitch);
                 float z = orbitRadius * (float)Math.Sin(MathHelper.PiOver2 + Pitch) * (float)Math.Cos(Yaw);
 
                 Position = targetPosition + new Vector3(x, y, z);
 
-                // Create the world matrix for orbiting
                 WorldMatrix = Matrix.CreateLookAtRH(Position, targetPosition, Vector3.Up);
                 WorldMatrix = Matrix.Invert(WorldMatrix);
             }

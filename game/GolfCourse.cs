@@ -12,7 +12,7 @@ namespace game
         private Space space;
         private Model courseModel;
         private Model teeareaModel;
-        public StaticMesh TeeAreaMesh { get; private set; }  // Add this line to expose the tee area mesh
+        public StaticMesh TeeAreaMesh { get; private set; }  
 
         public GolfCourse(Game game, Space space)
         {
@@ -24,7 +24,6 @@ namespace game
 
         public void LoadCourse()
         {
-            // Load the main course model
             Vector3[] courseVertices;
             int[] courseIndices;
             ModelDataExtractor.GetVerticesAndIndicesFromModel(courseModel, out courseVertices, out courseIndices);
@@ -41,7 +40,6 @@ namespace game
             space.Add(courseMesh);
             Game.Components.Add(new StaticModel(courseModel, courseMesh.WorldTransform.Matrix, Game));
 
-            // Load the tee area model
             Vector3[] teeVertices;
             int[] teeIndices;
             ModelDataExtractor.GetVerticesAndIndicesFromModel(teeareaModel, out teeVertices, out teeIndices);
