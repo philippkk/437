@@ -17,6 +17,16 @@ using System.Runtime.InteropServices;
 
 /*
     todo: model, use Z forward Y up
+
+    whats left:
+    - proper ball hit logic
+    - cup logic
+    - gui
+    - other maps
+    - keeping top three scores
+    - two player mode
+    - main menu
+    - sounds
 */
 
 namespace game
@@ -66,7 +76,7 @@ namespace game
             crosshairTexture.SetData(new[] { Color.Black });
 
             space = new Space();
-            space.ForceUpdater.Gravity = new Vector3(0, -15.00f, 0);
+            space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
 
             TimeStepSettings timeStep = new TimeStepSettings();
             timeStep.TimeStepDuration = 1f / 60f;
@@ -122,26 +132,20 @@ namespace game
 
             Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
 
-            if (MouseState.LeftButton == ButtonState.Released)
-            {
-                clicking = false;
-            }
-
             if (Camera.isOrbiting)
             {
-                if (MouseState.LeftButton == ButtonState.Pressed && !clicking)
-                {
-                    clicking = true;
-                    numStrokes++;
-                    golfBall.ApplyForce(Camera.WorldMatrix.Forward);
-                }
+                golfBall.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
             }
             else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
             {
                 clicking = true;
-                numStrokes++;
                 golfBall.SpawnBall();
                 numBalls++;
+            }
+
+            if (MouseState.LeftButton == ButtonState.Released)
+            {
+                clicking = false;
             }
 
             space.Update();
@@ -157,7 +161,9 @@ namespace game
             GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
             base.Draw(gameTime);
-
+            
+            // Add trajectory line drawing before UI elements
+            golfBall.Draw();
            
             drawCroshair();
             drawStrokeText();

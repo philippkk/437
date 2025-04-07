@@ -8,6 +8,7 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace game
 {
@@ -21,6 +22,13 @@ namespace game
         private Space space;
         private Sphere ballEntity;
         private GolfCourse golfCourse;
+        private TrajectoryLine trajectoryLine;
+        private const float FORCE_MAGNITUDE = 40f;  // Matching the force from ApplyForce method
+        private const float MIN_FORCE = 10f;
+        private const float MAX_FORCE = 60f;
+        private const float CHARGE_TIME = 3.0f; // Time in seconds for max charge
+        private float currentChargeTime = 0f;
+        private bool isCharging = false;
 
         public GolfBall(Game game, Camera camera, Space space)
         {
@@ -29,6 +37,7 @@ namespace game
             this.space = space;
             this.golfCourse = game.golfCourse;
             Model = game.GolfBallModel;
+            trajectoryLine = new TrajectoryLine(game);
         }
 
         public bool SpawnBall()
@@ -82,26 +91,69 @@ namespace game
             }
         }
 
-        public void ApplyForce(Vector3 direction)
+        public void Update(float dt)
         {
-            if (ballEntity != null)
+            if (ballEntity != null && camera.isOrbiting)
             {
-                // Normalize the direction vector
-                direction.Normalize();
+                // Handle shot charging
+                MouseState mouseState = Game.MouseState;
                 
-                // Add a slight upward component to prevent ground shooting
-                Vector3 upwardBias = new Vector3(0, 0.3f, 0);
-                Vector3 adjustedDirection = direction + upwardBias;
-                adjustedDirection.Normalize();
+                if (mouseState.LeftButton == ButtonState.Pressed)
+                {
+                    if (!isCharging)
+                    {
+                        isCharging = true;
+                        currentChargeTime = 0f;
+                    }
+                    else
+                    {
+                        currentChargeTime = Math.Min(currentChargeTime + dt, CHARGE_TIME);
+                    }
 
-                // Apply the force - adjust the multiplier to control shot strength
-                float forceMagnitude = 30f;
-                ballEntity.LinearVelocity = adjustedDirection * forceMagnitude;
+                    // Calculate current force for trajectory preview
+                    float chargePercent = currentChargeTime / CHARGE_TIME;
+                    float currentForce = MathHelper.Lerp(MIN_FORCE, MAX_FORCE, chargePercent);
+
+                    // Update trajectory with current force
+                    Vector3 direction = camera.WorldMatrix.Forward;
+                    Vector3 upwardBias = new Vector3(0, 0.3f, 0);
+                    Vector3 adjustedDirection = direction + upwardBias;
+                    adjustedDirection.Normalize();
+                    
+                    trajectoryLine.UpdateTrajectory(ballEntity.Position, adjustedDirection, currentForce);
+                }
+                else if (mouseState.LeftButton == ButtonState.Released && isCharging)
+                {
+                    // Apply the charged-up force when releasing the button
+                    float chargePercent = currentChargeTime / CHARGE_TIME;
+                    float finalForce = MathHelper.Lerp(MIN_FORCE, MAX_FORCE, chargePercent);
+                    
+                    Vector3 direction = camera.WorldMatrix.Forward;
+                    Vector3 upwardBias = new Vector3(0, 0.3f, 0);
+                    Vector3 adjustedDirection = direction + upwardBias;
+                    adjustedDirection.Normalize();
+                    
+                    ballEntity.LinearVelocity = adjustedDirection * finalForce;
+                    
+                    // Reset charging state
+                    isCharging = false;
+                    currentChargeTime = 0f;
+                    Game.numStrokes++;
+                }
             }
         }
 
-        public void Update(float dt)
+        public void ApplyForce(Vector3 direction)
         {
+            // This method is now handled by the Update method's charge mechanic
+        }
+
+        public void Draw()
+        {
+            if (ballEntity != null && camera.isOrbiting)
+            {
+                trajectoryLine.Draw();
+            }
         }
     }
 }
