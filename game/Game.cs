@@ -53,6 +53,9 @@ namespace game
         public int numBalls = 0;
         public int numStrokes = 0;
 
+        private MenuScreen menuScreen;
+        public bool isInGame { get; private set; } = false;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -68,8 +71,13 @@ namespace game
             graphics.ApplyChanges();
             base.Initialize();
         }
+
         protected override void LoadContent()
         {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>("Arial");
+            menuScreen = new MenuScreen(this, spriteBatch, font);
+
             GolfBallModel = Content.Load<Model>("golfball3");
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
@@ -80,21 +88,26 @@ namespace game
 
             powerBarTexture = new Texture2D(GraphicsDevice, 1, 1);
             powerBarTexture.SetData(new[] { Color.White });
+        }
 
-            space = new Space();
-            space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
+        public void StartGame()
+        {
+            if (!isInGame)
+            {
+                space = new Space();
+                space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
 
-            TimeStepSettings timeStep = new TimeStepSettings();
-            timeStep.TimeStepDuration = 1f / 60f;
-            space.TimeStepSettings = timeStep;
+                TimeStepSettings timeStep = new TimeStepSettings();
+                timeStep.TimeStepDuration = 1f / 60f;
+                space.TimeStepSettings = timeStep;
 
-            golfCourse = new GolfCourse(this, space);
-            golfCourse.LoadCourse();
+                golfCourse = new GolfCourse(this, space);
+                golfCourse.LoadCourse();
 
-            golfBall = new GolfBall(this, Camera, space);
-
-            spriteBatch = new SpriteBatch(GraphicsDevice);
-            font = Content.Load<SpriteFont>("Arial");
+                golfBall = new GolfBall(this, Camera, space);
+                
+                isInGame = true;
+            }
         }
 
         void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
@@ -107,12 +120,10 @@ namespace game
             }
         }
 
-
         protected override void UnloadContent()
         {
             // lol
         }
-
 
         bool clicking = false;
         protected override void Update(GameTime gameTime)
@@ -126,68 +137,81 @@ namespace game
                 return;
             }
 
-            if (KeyboardState.IsKeyDown(Keys.R))
+            if (!isInGame)
             {
-                if (numBalls > 0)
+                menuScreen.Update();
+            }
+            else
+            {
+                if (KeyboardState.IsKeyDown(Keys.R))
                 {
-                    Camera.isOrbiting = false;
-                    golfBall.DeleteBall();
-                    numBalls = 0;
+                    if (numBalls > 0)
+                    {
+                        Camera.isOrbiting = false;
+                        golfBall.DeleteBall();
+                        numBalls = 0;
+                    }
                 }
+
+                Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+
+                if (Camera.isOrbiting)
+                {
+                    golfBall.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                }
+                else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
+                {
+                    clicking = true;
+                    golfBall.SpawnBall();
+                    numBalls++;
+                }
+
+                if (MouseState.LeftButton == ButtonState.Released)
+                {
+                    clicking = false;
+                }
+
+                space.Update();
             }
 
-            Camera.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-
-            if (Camera.isOrbiting)
-            {
-                golfBall.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
-            }
-            else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
-            {
-                clicking = true;
-                golfBall.SpawnBall();
-                numBalls++;
-            }
-
-            if (MouseState.LeftButton == ButtonState.Released)
-            {
-                clicking = false;
-            }
-
-            space.Update();
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.DarkGray);
 
-            GraphicsDevice.BlendState = BlendState.Opaque;
-            GraphicsDevice.DepthStencilState = DepthStencilState.Default;
-            GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
+            if (!isInGame)
+            {
+                menuScreen.Draw();
+            }
+            else
+            {
+                GraphicsDevice.BlendState = BlendState.Opaque;
+                GraphicsDevice.DepthStencilState = DepthStencilState.Default;
+                GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
-            base.Draw(gameTime);
-            
-            golfBall.Draw();
-           
-            drawCroshair();
-            drawPowerBar();
-            drawStrokeText();
-            drawControls();
-            drawWinText();  // Add win text drawing
+                base.Draw(gameTime);
+                
+                golfBall.Draw();
+               
+                drawCroshair();
+                drawPowerBar();
+                drawStrokeText();
+                drawControls();
+                drawWinText(); 
+            }
         }
 
         private void DrawTextWithOutline(string text, XNAVector2 position, Color textColor)
         {
             float outlineSize = 2.0f;
             
-            // Draw outline
             spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, -outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, -outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, outlineSize), Color.White);
             
-            // Draw main text
             spriteBatch.DrawString(font, text, position, textColor);
         }
 
@@ -230,7 +254,6 @@ namespace game
                 );
                 DrawTextWithOutline(angleText, anglePosition, Color.Black);
                 
-                // Draw power bar background and fill (unchanged)
                 spriteBatch.Draw(powerBarTexture,
                     new Rectangle(barX, barY, barWidth, barHeight),
                     Color.DarkGray);

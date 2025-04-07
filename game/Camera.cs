@@ -59,6 +59,10 @@ namespace game
 
         public void Update(float dt)
         {
+            // Don't update camera if game is in menu
+            if (!Game.isInGame)
+                return;
+
             if (Game.KeyboardState.IsKeyDown(Keys.F) && !lastFrameFPressed && getTargetPosition != null)
             {
                 isOrbiting = !isOrbiting;
