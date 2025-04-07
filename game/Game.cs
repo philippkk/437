@@ -20,13 +20,13 @@ using System.Runtime.InteropServices;
 
     whats left:
     X proper ball hit logic, done
-    - cup logic
+    x cup logic
     x gui, done
-    - main menu
+    x main menu
+    x add help on bottom right (tab and menu controlls)
     - other maps
     - keeping top three scores
-    - two player mode
-    - main menu
+    - two player mod
     - sounds
 */
 
@@ -40,15 +40,16 @@ namespace game
         public Model GolfBallModel;
         public Model Map1;
         public Model Map1teearea;
-        public Model Map1hole; 
+        public Model Map1hole;
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
         public GolfCourse golfCourse { get; private set; }
         private SpriteBatch spriteBatch;
         private SpriteFont font;
+        private SpriteFont smallFont;  
         private Texture2D crosshairTexture;
-        private Texture2D powerBarTexture; 
+        private Texture2D powerBarTexture;
 
         public int numBalls = 0;
         public int numStrokes = 0;
@@ -76,12 +77,13 @@ namespace game
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             font = Content.Load<SpriteFont>("Arial");
-            menuScreen = new MenuScreen(this, spriteBatch, font);
+            smallFont = Content.Load<SpriteFont>("ArialSmall");
+            menuScreen = new MenuScreen(this, spriteBatch, font, smallFont);
 
             GolfBallModel = Content.Load<Model>("golfball3");
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
-            Map1hole = Content.Load<Model>("map1hole");  
+            Map1hole = Content.Load<Model>("map1hole");
 
             crosshairTexture = new Texture2D(GraphicsDevice, 1, 1);
             crosshairTexture.SetData(new[] { Color.Black });
@@ -105,7 +107,7 @@ namespace game
                 golfCourse.LoadCourse();
 
                 golfBall = new GolfBall(this, Camera, space);
-                
+
                 isInGame = true;
             }
         }
@@ -192,43 +194,44 @@ namespace game
                 GraphicsDevice.SamplerStates[0] = SamplerState.LinearWrap;
 
                 base.Draw(gameTime);
-                
+
                 golfBall.Draw();
-               
+
                 drawCroshair();
                 drawPowerBar();
                 drawStrokeText();
                 drawControls();
-                drawWinText(); 
+                drawWinText();
             }
         }
 
         private void DrawTextWithOutline(string text, XNAVector2 position, Color textColor)
         {
             float outlineSize = 2.0f;
-            
+
             spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, -outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, -outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, outlineSize), Color.White);
             spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, outlineSize), Color.White);
-            
+
             spriteBatch.DrawString(font, text, position, textColor);
         }
 
-        void drawCroshair(){
-            if(!Camera.isOrbiting)
+        void drawCroshair()
+        {
+            if (!Camera.isOrbiting)
             {
-            spriteBatch.Begin();
-            spriteBatch.Draw(crosshairTexture, 
-                new XNAVector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2), 
-                null, 
-                new Color(128, 128, 128, 128), 
-                0f, 
-                new XNAVector2(0.5f, 0.5f), 
-                4f, 
-                SpriteEffects.None, 
-                0f);
-            spriteBatch.End();
+                spriteBatch.Begin();
+                spriteBatch.Draw(crosshairTexture,
+                    new XNAVector2(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2),
+                    null,
+                    new Color(128, 128, 128, 128),
+                    0f,
+                    new XNAVector2(0.5f, 0.5f),
+                    4f,
+                    SpriteEffects.None,
+                    0f);
+                spriteBatch.End();
             }
         }
 
@@ -238,9 +241,9 @@ namespace game
             {
                 GraphicsDevice.BlendState = BlendState.AlphaBlend;
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
-                
+
                 spriteBatch.Begin();
-                
+
                 int barWidth = 200;
                 int barHeight = 20;
                 int barX = GraphicsDevice.Viewport.Width / 2 - barWidth / 2;
@@ -249,23 +252,23 @@ namespace game
                 string angleText = $"{golfBall.CurrentAngle:F0}°";
                 XNAVector2 textSize = font.MeasureString(angleText);
                 XNAVector2 anglePosition = new XNAVector2(
-                    barX + (barWidth / 2) - (textSize.X / 2), 
-                    barY - textSize.Y - 5  
+                    barX + (barWidth / 2) - (textSize.X / 2),
+                    barY - textSize.Y - 5
                 );
                 DrawTextWithOutline(angleText, anglePosition, Color.Black);
-                
+
                 spriteBatch.Draw(powerBarTexture,
                     new Rectangle(barX, barY, barWidth, barHeight),
                     Color.DarkGray);
 
                 float powerPercent = golfBall.CurrentPowerPercent;
                 int fillWidth = (int)(barWidth * powerPercent);
-                
+
                 Color powerColor = Color.Lerp(Color.Green, Color.Red, powerPercent);
                 spriteBatch.Draw(powerBarTexture,
                     new Rectangle(barX, barY, fillWidth, barHeight),
                     powerColor);
-                
+
                 spriteBatch.End();
             }
         }
@@ -284,13 +287,15 @@ namespace game
             DrawTextWithOutline(strokeText, position, Color.Black);
             spriteBatch.End();
         }
-
         void drawControls()
         {
+            spriteBatch.Begin();
+
+            string[] controls = {"press tab for controls"};
             if (KeyboardState.IsKeyDown(Keys.Tab))
             {
-                spriteBatch.Begin();
-                string[] controls = {
+                controls = new string[]
+                {
                     "Controls:",
                     "F - Toggle Orbit Mode",
                     "Left Click - Place/Shoot Ball",
@@ -299,30 +304,38 @@ namespace game
                     "R - Reset Ball",
                     "ESC - Exit",
                 };
-
-                int padding = 10;
-                int lineSpacing = 5;
-                float maxWidth = 0;
-                
-                foreach (string line in controls)
-                {
-                    XNAVector2 size = font.MeasureString(line);
-                    maxWidth = Math.Max(maxWidth, size.X);
-                }
-
-                float currentY = GraphicsDevice.Viewport.Height - padding - (controls.Length * (font.LineSpacing + lineSpacing));
-                foreach (string line in controls)
-                {
-                    XNAVector2 size = font.MeasureString(line);
-                    float x = GraphicsDevice.Viewport.Width - padding - maxWidth;
-                    DrawTextWithOutline(line, new XNAVector2(x, currentY), Color.Black);
-                    currentY += font.LineSpacing + lineSpacing;
-                }
-                
-                spriteBatch.End();
             }
-        }
 
+            int padding = 10;
+            int lineSpacing = 3;
+            float maxWidth = 0;
+
+            foreach (string line in controls)
+            {
+                XNAVector2 size = smallFont.MeasureString(line);
+                maxWidth = Math.Max(maxWidth, size.X);
+            }
+
+            float currentY = GraphicsDevice.Viewport.Height - padding - (controls.Length * (smallFont.LineSpacing + lineSpacing));
+            foreach (string line in controls)
+            {
+                XNAVector2 size = smallFont.MeasureString(line);
+                float x = GraphicsDevice.Viewport.Width - padding - maxWidth;
+
+                float outlineSize = 2.0f;
+                Color outlineColor = Color.White;
+                spriteBatch.DrawString(smallFont, line, new XNAVector2(x - outlineSize, currentY - outlineSize), outlineColor);
+                spriteBatch.DrawString(smallFont, line, new XNAVector2(x + outlineSize, currentY - outlineSize), outlineColor);
+                spriteBatch.DrawString(smallFont, line, new XNAVector2(x - outlineSize, currentY + outlineSize), outlineColor);
+                spriteBatch.DrawString(smallFont, line, new XNAVector2(x + outlineSize, currentY + outlineSize), outlineColor);
+
+                spriteBatch.DrawString(smallFont, line, new XNAVector2(x, currentY), Color.Black);
+
+                currentY += smallFont.LineSpacing + lineSpacing;
+            }
+
+            spriteBatch.End();
+        }
         void drawWinText()
         {
             if (golfBall != null && golfBall.HasWon)
@@ -331,18 +344,17 @@ namespace game
                 GraphicsDevice.DepthStencilState = DepthStencilState.None;
 
                 spriteBatch.Begin();
-                
+
                 string winText = "U WIN";
                 XNAVector2 textSize = font.MeasureString(winText);
                 XNAVector2 position = new XNAVector2(
                     GraphicsDevice.Viewport.Width / 2 - textSize.X / 2,
                     GraphicsDevice.Viewport.Height / 2 - textSize.Y / 2
                 );
-                
+
                 DrawTextWithOutline(winText, position, Color.Green);
                 spriteBatch.End();
             }
         }
     }
-
 }

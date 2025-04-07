@@ -25,15 +25,15 @@ namespace game
         private TrajectoryLine trajectoryLine;
         private const float minForce = 10f;
         private const float maxForce = 40f;
-        private const float chargeTime = 3.0f; 
-        private const float angleChangeRate = 45f; 
-        private const float minAngle = 0f;  
-        private const float maxAngle = 85f; 
-        private const float powerOscillationSpeed = 2f; 
+        private const float chargeTime = 3.0f;
+        private const float angleChangeRate = 45f;
+        private const float minAngle = 0f;
+        private const float maxAngle = 85f;
+        private const float powerOscillationSpeed = 2f;
         private float currentChargeTime = 0f;
         private bool isCharging = false;
         private bool powerIncreasing = true;
-        private float currentAngle = 45f; 
+        private float currentAngle = 45f;
         private bool hasWon = false;
 
         public bool IsCharging => isCharging;
@@ -55,7 +55,7 @@ namespace game
         {
             Vector3 rayStart = camera.Position;
             Vector3 rayDirection = camera.WorldMatrix.Forward;
-            
+
             BEPUutilities.Ray ray = new BEPUutilities.Ray(rayStart, rayDirection);
             BEPUphysics.RayCastResult raycastResult;
             bool hit = space.RayCast(ray, (entry) => true, out raycastResult);
@@ -63,7 +63,7 @@ namespace game
             if (hit && raycastResult.HitObject == golfCourse.TeeAreaMesh)
             {
                 Vector3 spawnPosition = rayStart + rayDirection * raycastResult.HitData.T + new Vector3(0, 1, 0);
-                
+
                 ballEntity = new Sphere(spawnPosition, 1, 1);
                 camera.SetTarget(ballEntity);
 
@@ -113,6 +113,7 @@ namespace game
             if (ballEntity != null && camera.isOrbiting)
             {
                 KeyboardState keyState = Keyboard.GetState();
+
                 if (keyState.IsKeyDown(Keys.E))
                 {
                     currentAngle = Math.Min(currentAngle + angleChangeRate * dt, maxAngle);
@@ -123,7 +124,6 @@ namespace game
                 }
 
                 MouseState mouseState = Game.MouseState;
-                
                 if (mouseState.LeftButton == ButtonState.Pressed)
                 {
                     if (!isCharging)
@@ -134,89 +134,74 @@ namespace game
                     }
                     else
                     {
-                        if (powerIncreasing)
-                        {
-                            currentChargeTime += dt * powerOscillationSpeed;
-                            if (currentChargeTime >= chargeTime)
-                            {
-                                currentChargeTime = chargeTime;
-                                powerIncreasing = false;
-                            }
-                        }
-                        else
-                        {
-                            currentChargeTime -= dt * powerOscillationSpeed;
-                            if (currentChargeTime <= 0f)
-                            {
-                                currentChargeTime = 0f;
-                                powerIncreasing = true;
-                            }
-                        }
+                        handlePowerOscillation(dt);
                     }
 
                     float chargePercent = currentChargeTime / chargeTime;
-                    float currentForce = MathHelper.Lerp(minForce, maxForce, chargePercent);
+                    float finalForce = MathHelper.Lerp(minForce, maxForce, chargePercent);
 
-                    Microsoft.Xna.Framework.Vector3 cameraForward = new Microsoft.Xna.Framework.Vector3(
-                        camera.WorldMatrix.Forward.X,
-                        0,
-                        camera.WorldMatrix.Forward.Z
-                    );
-                    cameraForward.Normalize();
-
-                    float verticalComponent = (float)Math.Sin(MathHelper.ToRadians(currentAngle));
-                    float horizontalScale = (float)Math.Cos(MathHelper.ToRadians(currentAngle));
-
-                    Microsoft.Xna.Framework.Vector3 finalDirection = new Microsoft.Xna.Framework.Vector3(
-                        cameraForward.X * horizontalScale,
-                        verticalComponent,
-                        cameraForward.Z * horizontalScale
-                    );
-                    finalDirection.Normalize();
-                    
-                    Vector3 adjustedDirection = new Vector3(
-                        finalDirection.X,
-                        finalDirection.Y,
-                        finalDirection.Z
-                    );
-                    
-                    trajectoryLine.UpdateTrajectory(ballEntity.Position, adjustedDirection, currentForce);
+                    Vector3 adjustedDirection = getAdjustedDirection();
+                    trajectoryLine.UpdateTrajectory(ballEntity.Position, adjustedDirection, finalForce);
                 }
                 else if (mouseState.LeftButton == ButtonState.Released && isCharging)
                 {
                     float chargePercent = currentChargeTime / chargeTime;
                     float finalForce = MathHelper.Lerp(minForce, maxForce, chargePercent);
-                    
-                    Microsoft.Xna.Framework.Vector3 cameraForward = new Microsoft.Xna.Framework.Vector3(
-                        camera.WorldMatrix.Forward.X,
-                        0,
-                        camera.WorldMatrix.Forward.Z
-                    );
-                    cameraForward.Normalize();
 
-                    float verticalComponent = (float)Math.Sin(MathHelper.ToRadians(currentAngle));
-                    float horizontalScale = (float)Math.Cos(MathHelper.ToRadians(currentAngle));
-
-                    Microsoft.Xna.Framework.Vector3 finalDirection = new Microsoft.Xna.Framework.Vector3(
-                        cameraForward.X * horizontalScale,
-                        verticalComponent,
-                        cameraForward.Z * horizontalScale
-                    );
-                    finalDirection.Normalize();
-                    
-                    Vector3 adjustedDirection = new Vector3(
-                        finalDirection.X,
-                        finalDirection.Y,
-                        finalDirection.Z
-                    );
-                    
+                    Vector3 adjustedDirection = getAdjustedDirection();
                     ballEntity.LinearVelocity = adjustedDirection * finalForce;
-                    
+
                     isCharging = false;
                     currentChargeTime = 0f;
                     Game.numStrokes++;
                 }
             }
+        }
+        private void handlePowerOscillation(float dt)
+        {
+            if (powerIncreasing)
+            {
+                currentChargeTime += dt * powerOscillationSpeed;
+                if (currentChargeTime >= chargeTime)
+                {
+                    currentChargeTime = chargeTime;
+                    powerIncreasing = false;
+                }
+            }
+            else
+            {
+                currentChargeTime -= dt * powerOscillationSpeed;
+                if (currentChargeTime <= 0f)
+                {
+                    currentChargeTime = 0f;
+                    powerIncreasing = true;
+                }
+            }
+        }
+        private Vector3 getAdjustedDirection()
+        {
+            Microsoft.Xna.Framework.Vector3 cameraForward = new Microsoft.Xna.Framework.Vector3(
+                camera.WorldMatrix.Forward.X,
+                0,
+                camera.WorldMatrix.Forward.Z
+            );
+            cameraForward.Normalize();
+
+            float verticalComponent = (float)Math.Sin(MathHelper.ToRadians(currentAngle));
+            float horizontalScale = (float)Math.Cos(MathHelper.ToRadians(currentAngle));
+
+            Microsoft.Xna.Framework.Vector3 finalDirection = new Microsoft.Xna.Framework.Vector3(
+                cameraForward.X * horizontalScale,
+                verticalComponent,
+                cameraForward.Z * horizontalScale
+            );
+            finalDirection.Normalize();
+
+            return new Vector3(
+                finalDirection.X,
+                finalDirection.Y,
+                finalDirection.Z
+            );
         }
         public void Draw()
         {

@@ -48,3 +48,4 @@
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Arial.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map1teearea.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map1hole.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/ArialSmall.xnb
