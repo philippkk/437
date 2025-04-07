@@ -36,6 +36,10 @@ namespace game
         private bool powerIncreasing = true;
         private float currentAngle = 45f; // Starting at 45 degrees
 
+        public bool IsCharging => isCharging;
+        public float CurrentPowerPercent => currentChargeTime / CHARGE_TIME;
+        public float CurrentAngle => currentAngle;
+
         public GolfBall(Game game, Camera camera, Space space)
         {
             Game = game;
@@ -103,11 +107,11 @@ namespace game
             {
                 // Handle trajectory angle adjustment
                 KeyboardState keyState = Keyboard.GetState();
-                if (keyState.IsKeyDown(Keys.Up))
+                if (keyState.IsKeyDown(Keys.E))
                 {
                     currentAngle = Math.Min(currentAngle + ANGLE_CHANGE_RATE * dt, MAX_ANGLE);
                 }
-                if (keyState.IsKeyDown(Keys.Down))
+                if (keyState.IsKeyDown(Keys.Q))
                 {
                     currentAngle = Math.Max(currentAngle - ANGLE_CHANGE_RATE * dt, MIN_ANGLE);
                 }

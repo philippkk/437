@@ -46,6 +46,7 @@ namespace game
         private SpriteBatch spriteBatch;
         private SpriteFont font;
         private Texture2D crosshairTexture;
+        private Texture2D powerBarTexture;  // Added for power bar
 
         public int numBalls = 0;
         public int numStrokes = 0;
@@ -71,9 +72,12 @@ namespace game
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
 
-            // Create a 1x1 white texture for the crosshair
+            // Create textures for UI elements
             crosshairTexture = new Texture2D(GraphicsDevice, 1, 1);
             crosshairTexture.SetData(new[] { Color.Black });
+
+            powerBarTexture = new Texture2D(GraphicsDevice, 1, 1);
+            powerBarTexture.SetData(new[] { Color.White });
 
             space = new Space();
             space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
@@ -166,7 +170,9 @@ namespace game
             golfBall.Draw();
            
             drawCroshair();
+            drawPowerBar();  // Add power bar drawing
             drawStrokeText();
+            drawControls();  // Add the new controls display
         }
 
         void drawCroshair(){
@@ -186,6 +192,48 @@ namespace game
             }
         }
 
+        void drawPowerBar()
+        {
+            if (golfBall != null && Camera.isOrbiting && golfBall.IsCharging)
+            {
+                GraphicsDevice.BlendState = BlendState.AlphaBlend;
+                GraphicsDevice.DepthStencilState = DepthStencilState.None;
+                
+                spriteBatch.Begin();
+                
+                // Draw background (gray bar)
+                int barWidth = 200;
+                int barHeight = 20;
+                int barX = GraphicsDevice.Viewport.Width / 2 - barWidth / 2;
+                int barY = GraphicsDevice.Viewport.Height - 50;
+
+                // Draw angle text centered above the bar
+                string angleText = $"{golfBall.CurrentAngle:F0}°";
+                XNAVector2 textSize = font.MeasureString(angleText);
+                XNAVector2 anglePosition = new XNAVector2(
+                    barX + (barWidth / 2) - (textSize.X / 2),  // Center text above bar
+                    barY - textSize.Y - 5  // Position text above bar with 5px padding
+                );
+                spriteBatch.DrawString(font, angleText, anglePosition, Color.Black);
+                
+                // Draw the power bar
+                spriteBatch.Draw(powerBarTexture,
+                    new Rectangle(barX, barY, barWidth, barHeight),
+                    Color.DarkGray);
+
+                // Draw power level (colored bar)
+                float powerPercent = golfBall.CurrentPowerPercent;
+                int fillWidth = (int)(barWidth * powerPercent);
+                
+                Color powerColor = Color.Lerp(Color.Green, Color.Red, powerPercent);
+                spriteBatch.Draw(powerBarTexture,
+                    new Rectangle(barX, barY, fillWidth, barHeight),
+                    powerColor);
+                
+                spriteBatch.End();
+            }
+        }
+
         void drawStrokeText()
         {
             GraphicsDevice.BlendState = BlendState.AlphaBlend;
@@ -199,6 +247,46 @@ namespace game
             XNAVector2 position = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - textSize.X / 2, 10);
             spriteBatch.DrawString(font, strokeText, position, Color.Black);
             spriteBatch.End();
+        }
+
+        void drawControls()
+        {
+            if (KeyboardState.IsKeyDown(Keys.Tab))
+            {
+                spriteBatch.Begin();
+                string[] controls = {
+                    "Controls:",
+                    "F - Toggle Orbit Mode",
+                    "Left Click - Place/Shoot Ball",
+                    "Q/E - Adjust Shot Angle",
+                    "Mouse - Aim Direction",
+                    "R - Reset Ball",
+                    "ESC - Exit",
+                };
+
+                int padding = 10;
+                int lineSpacing = 5;
+                float maxWidth = 0;
+                
+                // First pass to find the widest line
+                foreach (string line in controls)
+                {
+                    XNAVector2 size = font.MeasureString(line);
+                    maxWidth = Math.Max(maxWidth, size.X);
+                }
+
+                // Draw each line from bottom to top
+                float currentY = GraphicsDevice.Viewport.Height - padding - (controls.Length * (font.LineSpacing + lineSpacing));
+                foreach (string line in controls)
+                {
+                    XNAVector2 size = font.MeasureString(line);
+                    float x = GraphicsDevice.Viewport.Width - padding - maxWidth;
+                    spriteBatch.DrawString(font, line, new XNAVector2(x, currentY), Color.Black);
+                    currentY += font.LineSpacing + lineSpacing;
+                }
+                
+                spriteBatch.End();
+            }
         }
     }
 
