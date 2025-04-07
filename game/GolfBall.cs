@@ -25,10 +25,16 @@ namespace game
         private TrajectoryLine trajectoryLine;
         private const float FORCE_MAGNITUDE = 40f;  // Matching the force from ApplyForce method
         private const float MIN_FORCE = 10f;
-        private const float MAX_FORCE = 60f;
+        private const float MAX_FORCE = 40f;
         private const float CHARGE_TIME = 3.0f; // Time in seconds for max charge
+        private const float ANGLE_CHANGE_RATE = 45f; // Degrees per second
+        private const float MIN_ANGLE = 0f;  // Parallel to ground
+        private const float MAX_ANGLE = 85f; // Nearly vertical
+        private const float POWER_OSCILLATION_SPEED = 2f; // Complete cycles per second
         private float currentChargeTime = 0f;
         private bool isCharging = false;
+        private bool powerIncreasing = true;
+        private float currentAngle = 45f; // Starting at 45 degrees
 
         public GolfBall(Game game, Camera camera, Space space)
         {
@@ -95,6 +101,17 @@ namespace game
         {
             if (ballEntity != null && camera.isOrbiting)
             {
+                // Handle trajectory angle adjustment
+                KeyboardState keyState = Keyboard.GetState();
+                if (keyState.IsKeyDown(Keys.Up))
+                {
+                    currentAngle = Math.Min(currentAngle + ANGLE_CHANGE_RATE * dt, MAX_ANGLE);
+                }
+                if (keyState.IsKeyDown(Keys.Down))
+                {
+                    currentAngle = Math.Max(currentAngle - ANGLE_CHANGE_RATE * dt, MIN_ANGLE);
+                }
+
                 // Handle shot charging
                 MouseState mouseState = Game.MouseState;
                 
@@ -104,21 +121,61 @@ namespace game
                     {
                         isCharging = true;
                         currentChargeTime = 0f;
+                        powerIncreasing = true;
                     }
                     else
                     {
-                        currentChargeTime = Math.Min(currentChargeTime + dt, CHARGE_TIME);
+                        // Update charge time based on oscillation direction
+                        if (powerIncreasing)
+                        {
+                            currentChargeTime += dt * POWER_OSCILLATION_SPEED;
+                            if (currentChargeTime >= CHARGE_TIME)
+                            {
+                                currentChargeTime = CHARGE_TIME;
+                                powerIncreasing = false;
+                            }
+                        }
+                        else
+                        {
+                            currentChargeTime -= dt * POWER_OSCILLATION_SPEED;
+                            if (currentChargeTime <= 0f)
+                            {
+                                currentChargeTime = 0f;
+                                powerIncreasing = true;
+                            }
+                        }
                     }
 
                     // Calculate current force for trajectory preview
                     float chargePercent = currentChargeTime / CHARGE_TIME;
                     float currentForce = MathHelper.Lerp(MIN_FORCE, MAX_FORCE, chargePercent);
 
-                    // Update trajectory with current force
-                    Vector3 direction = camera.WorldMatrix.Forward;
-                    Vector3 upwardBias = new Vector3(0, 0.3f, 0);
-                    Vector3 adjustedDirection = direction + upwardBias;
-                    adjustedDirection.Normalize();
+                    // Get forward direction from camera but only use its horizontal component
+                    Microsoft.Xna.Framework.Vector3 cameraForward = new Microsoft.Xna.Framework.Vector3(
+                        camera.WorldMatrix.Forward.X,
+                        0, // Zero out the vertical component
+                        camera.WorldMatrix.Forward.Z
+                    );
+                    cameraForward.Normalize();
+
+                    // Calculate the vertical component based on the current angle
+                    float verticalComponent = (float)Math.Sin(MathHelper.ToRadians(currentAngle));
+                    float horizontalScale = (float)Math.Cos(MathHelper.ToRadians(currentAngle));
+
+                    // Combine horizontal and vertical components
+                    Microsoft.Xna.Framework.Vector3 finalDirection = new Microsoft.Xna.Framework.Vector3(
+                        cameraForward.X * horizontalScale,
+                        verticalComponent,
+                        cameraForward.Z * horizontalScale
+                    );
+                    finalDirection.Normalize();
+                    
+                    // Convert to BEPU Vector3
+                    Vector3 adjustedDirection = new Vector3(
+                        finalDirection.X,
+                        finalDirection.Y,
+                        finalDirection.Z
+                    );
                     
                     trajectoryLine.UpdateTrajectory(ballEntity.Position, adjustedDirection, currentForce);
                 }
@@ -128,10 +185,32 @@ namespace game
                     float chargePercent = currentChargeTime / CHARGE_TIME;
                     float finalForce = MathHelper.Lerp(MIN_FORCE, MAX_FORCE, chargePercent);
                     
-                    Vector3 direction = camera.WorldMatrix.Forward;
-                    Vector3 upwardBias = new Vector3(0, 0.3f, 0);
-                    Vector3 adjustedDirection = direction + upwardBias;
-                    adjustedDirection.Normalize();
+                    // Get forward direction from camera but only use its horizontal component
+                    Microsoft.Xna.Framework.Vector3 cameraForward = new Microsoft.Xna.Framework.Vector3(
+                        camera.WorldMatrix.Forward.X,
+                        0, // Zero out the vertical component
+                        camera.WorldMatrix.Forward.Z
+                    );
+                    cameraForward.Normalize();
+
+                    // Calculate the vertical component based on the current angle
+                    float verticalComponent = (float)Math.Sin(MathHelper.ToRadians(currentAngle));
+                    float horizontalScale = (float)Math.Cos(MathHelper.ToRadians(currentAngle));
+
+                    // Combine horizontal and vertical components
+                    Microsoft.Xna.Framework.Vector3 finalDirection = new Microsoft.Xna.Framework.Vector3(
+                        cameraForward.X * horizontalScale,
+                        verticalComponent,
+                        cameraForward.Z * horizontalScale
+                    );
+                    finalDirection.Normalize();
+                    
+                    // Convert to BEPU Vector3
+                    Vector3 adjustedDirection = new Vector3(
+                        finalDirection.X,
+                        finalDirection.Y,
+                        finalDirection.Z
+                    );
                     
                     ballEntity.LinearVelocity = adjustedDirection * finalForce;
                     
