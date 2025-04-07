@@ -19,9 +19,9 @@ using System.Runtime.InteropServices;
     todo: model, use Z forward Y up
 
     whats left:
-    - proper ball hit logic, done
+    X proper ball hit logic, done
     - cup logic
-    - gui, done
+    x gui, done
     - main menu
     - other maps
     - keeping top three scores
@@ -40,6 +40,7 @@ namespace game
         public Model GolfBallModel;
         public Model Map1;
         public Model Map1teearea;
+        public Model Map1hole; 
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
@@ -72,8 +73,8 @@ namespace game
             GolfBallModel = Content.Load<Model>("golfball3");
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
+            Map1hole = Content.Load<Model>("map1hole");  
 
-            // Create textures for UI elements
             crosshairTexture = new Texture2D(GraphicsDevice, 1, 1);
             crosshairTexture.SetData(new[] { Color.Black });
 
@@ -170,9 +171,24 @@ namespace game
             golfBall.Draw();
            
             drawCroshair();
-            drawPowerBar();  
+            drawPowerBar();
             drawStrokeText();
-            drawControls();  
+            drawControls();
+            drawWinText();  // Add win text drawing
+        }
+
+        private void DrawTextWithOutline(string text, XNAVector2 position, Color textColor)
+        {
+            float outlineSize = 2.0f;
+            
+            // Draw outline
+            spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, -outlineSize), Color.White);
+            spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, -outlineSize), Color.White);
+            spriteBatch.DrawString(font, text, position + new XNAVector2(-outlineSize, outlineSize), Color.White);
+            spriteBatch.DrawString(font, text, position + new XNAVector2(outlineSize, outlineSize), Color.White);
+            
+            // Draw main text
+            spriteBatch.DrawString(font, text, position, textColor);
         }
 
         void drawCroshair(){
@@ -212,8 +228,9 @@ namespace game
                     barX + (barWidth / 2) - (textSize.X / 2), 
                     barY - textSize.Y - 5  
                 );
-                spriteBatch.DrawString(font, angleText, anglePosition, Color.Black);
+                DrawTextWithOutline(angleText, anglePosition, Color.Black);
                 
+                // Draw power bar background and fill (unchanged)
                 spriteBatch.Draw(powerBarTexture,
                     new Rectangle(barX, barY, barWidth, barHeight),
                     Color.DarkGray);
@@ -241,7 +258,7 @@ namespace game
             string strokeText = $"Strokes: {numStrokes}";
             XNAVector2 textSize = font.MeasureString(strokeText);
             XNAVector2 position = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - textSize.X / 2, 10);
-            spriteBatch.DrawString(font, strokeText, position, Color.Black);
+            DrawTextWithOutline(strokeText, position, Color.Black);
             spriteBatch.End();
         }
 
@@ -275,10 +292,31 @@ namespace game
                 {
                     XNAVector2 size = font.MeasureString(line);
                     float x = GraphicsDevice.Viewport.Width - padding - maxWidth;
-                    spriteBatch.DrawString(font, line, new XNAVector2(x, currentY), Color.Black);
+                    DrawTextWithOutline(line, new XNAVector2(x, currentY), Color.Black);
                     currentY += font.LineSpacing + lineSpacing;
                 }
                 
+                spriteBatch.End();
+            }
+        }
+
+        void drawWinText()
+        {
+            if (golfBall != null && golfBall.HasWon)
+            {
+                GraphicsDevice.BlendState = BlendState.AlphaBlend;
+                GraphicsDevice.DepthStencilState = DepthStencilState.None;
+
+                spriteBatch.Begin();
+                
+                string winText = "U WIN";
+                XNAVector2 textSize = font.MeasureString(winText);
+                XNAVector2 position = new XNAVector2(
+                    GraphicsDevice.Viewport.Width / 2 - textSize.X / 2,
+                    GraphicsDevice.Viewport.Height / 2 - textSize.Y / 2
+                );
+                
+                DrawTextWithOutline(winText, position, Color.Green);
                 spriteBatch.End();
             }
         }

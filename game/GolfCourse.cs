@@ -12,7 +12,9 @@ namespace game
         private Space space;
         private Model courseModel;
         private Model teeareaModel;
-        public StaticMesh TeeAreaMesh { get; private set; }  
+        private Model holeModel;
+        public StaticMesh TeeAreaMesh { get; private set; }
+        public StaticMesh HoleMesh { get; private set; }
 
         public GolfCourse(Game game, Space space)
         {
@@ -20,6 +22,7 @@ namespace game
             this.space = space;
             courseModel = game.Map1;
             teeareaModel = game.Map1teearea;
+            holeModel = game.Map1hole;
         }
 
         public void LoadCourse()
@@ -55,6 +58,22 @@ namespace game
             TeeAreaMesh.Material = teeMaterial;
             space.Add(TeeAreaMesh);
             Game.Components.Add(new StaticModel(teeareaModel, TeeAreaMesh.WorldTransform.Matrix, Game));
+
+            Vector3[] holeVertices;
+            int[] holeIndices;
+            ModelDataExtractor.GetVerticesAndIndicesFromModel(holeModel, out holeVertices, out holeIndices);
+            HoleMesh = new StaticMesh(holeVertices, holeIndices, new AffineTransform(new Vector3(0, -40, 0)));
+
+            Material holeMaterial = new Material
+            {
+                Bounciness = 0.3f,
+                KineticFriction = 1f,
+                StaticFriction = 1f
+            };
+
+            HoleMesh.Material = holeMaterial;
+            space.Add(HoleMesh);
+            Game.Components.Add(new StaticModel(holeModel, HoleMesh.WorldTransform.Matrix, Game));
         }
     }
 }

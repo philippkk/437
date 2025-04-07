@@ -3,7 +3,7 @@
   <SourceFile>/Users/philipking/Desktop/437/game/Content/../../models/golfball3.fbx</SourceFile>
   <SourceTime>2025-03-07T13:30:35.7275833-06:00</SourceTime>
   <DestFile>/Users/philipking/Desktop/437/game/Content/bin/DesktopGL/golfball3.xnb</DestFile>
-  <DestTime>2025-04-04T14:45:35.2226791-05:00</DestTime>
+  <DestTime>2025-04-06T23:55:00.9728716-05:00</DestTime>
   <Importer>FbxImporter</Importer>
   <ImporterTime>2022-07-26T06:44:56-05:00</ImporterTime>
   <Processor>ModelProcessor</Processor>

@@ -8,6 +8,8 @@ using BEPUphysics.Entities.Prefabs;
 using BEPUphysics.Materials;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
+using BEPUphysics.NarrowPhaseSystems.Pairs;
+using BEPUphysics.BroadPhaseEntries;
 using MathHelper = Microsoft.Xna.Framework.MathHelper;
 
 namespace game
@@ -32,10 +34,12 @@ namespace game
         private bool isCharging = false;
         private bool powerIncreasing = true;
         private float currentAngle = 45f; 
+        private bool hasWon = false;
 
         public bool IsCharging => isCharging;
         public float CurrentPowerPercent => currentChargeTime / chargeTime;
         public float CurrentAngle => currentAngle;
+        public bool HasWon => hasWon;
 
         public GolfBall(Game game, Camera camera, Space space)
         {
@@ -78,10 +82,20 @@ namespace game
                 Game.Components.Add(model);
                 ballEntity.Tag = model;
 
+                ballEntity.CollisionInformation.Events.InitialCollisionDetected += HandleCollision;
+
                 return true;
             }
 
             return false;
+        }
+
+        private void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
+        {
+            if (other == golfCourse.HoleMesh)
+            {
+                hasWon = true;
+            }
         }
 
         public void DeleteBall()
