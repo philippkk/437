@@ -13,8 +13,11 @@ using Vector3 = BEPUutilities.Vector3;
 using Matrix = BEPUutilities.Matrix;
 using XNAVector2 = Microsoft.Xna.Framework.Vector2;
 using System;
+using System.Collections.Generic;
 using BEPUphysics.Materials;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Linq;
 
 /*
     todo: model, use Z forward Y up
@@ -27,10 +30,10 @@ using System.Runtime.InteropServices;
     x add help on bottom right (tab and menu controlls)
     x other maps
     - keeping top three scores
-    - keep for each map and have initials too
+      - keep for each map and have initials too
     - two player mode
         - logic for stopping a ball when too low speed to swap players
-    - sounds
+    x sounds
 */
 
 namespace game
@@ -61,9 +64,69 @@ namespace game
 
         public int numBalls = 0;
         public int numStrokes = 0;
+        public int totalStrokes = 0;
 
         private MenuScreen menuScreen;
         public bool isInGame { get; private set; } = false;
+        public bool isPromptingForInitials { get; private set; } = false;
+        private string currentInitials = "";
+        private const string SCORES_FILE = "highscores.txt";
+
+        private void SaveHighScore()
+        {
+            try
+            {
+                string directory = Path.GetDirectoryName(SCORES_FILE);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                
+                File.AppendAllText(SCORES_FILE, $"{currentInitials}:{totalStrokes}\n");
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving high score: {e.Message}");
+            }
+        }
+
+        public void HandleKeyPress(Keys key)
+        {
+            if (!isPromptingForInitials) return;
+            
+            if (key >= Keys.A && key <= Keys.Z && currentInitials.Length < 3)
+            {
+                currentInitials += key.ToString();
+            }
+            else if (key == Keys.Back && currentInitials.Length > 0)
+            {
+                currentInitials = currentInitials.Substring(0, currentInitials.Length - 1);
+            }
+            else if (key == Keys.Enter && currentInitials.Length > 0)
+            {
+                SaveHighScore();
+                isPromptingForInitials = false;
+                currentInitials = "";
+                isInGame = false;
+            }
+        }
+
+        public string GetCurrentInitials() => currentInitials;
+        public void PromptForInitials() => isPromptingForInitials = true;
+
+        public List<string> GetHighScores()
+        {
+            List<string> scores = new List<string>();
+            try
+            {
+                if (File.Exists(SCORES_FILE))
+                {
+                    scores = File.ReadAllLines(SCORES_FILE).ToList();
+                }
+            }
+            catch (Exception) { }
+            return scores;
+        }
 
         public Game()
         {
@@ -122,7 +185,15 @@ namespace game
                 golfBall = new GolfBall(this, Camera, space);
 
                 isInGame = true;
+                totalStrokes = 0; 
+                numStrokes = 0;
+                numBalls = 0;
             }
+        }
+
+        public void OnHoleComplete()
+        {
+            totalStrokes += numStrokes;
         }
 
         void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
@@ -141,6 +212,8 @@ namespace game
         }
 
         bool clicking = false;
+        private float winTextTimer = 0f;
+        private const float WIN_TEXT_DURATION = 4.0f; // 4 seconds before switching to initials prompt
         protected override void Update(GameTime gameTime)
         {
             KeyboardState = Keyboard.GetState();
@@ -152,12 +225,29 @@ namespace game
                 return;
             }
 
+            if (isPromptingForInitials)
+            {
+                menuScreen.Update();
+                return;
+            }
+
             if (!isInGame)
             {
                 menuScreen.Update();
             }
             else
             {
+                // Update win text timer
+                if (golfBall != null && golfBall.HasWon && golfCourse.IsLastMap())
+                {
+                    winTextTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    if (winTextTimer >= WIN_TEXT_DURATION)
+                    {
+                        PromptForInitials();
+                        winTextTimer = 0f;
+                    }
+                }
+
                 if (KeyboardState.IsKeyDown(Keys.R))
                 {
                     if (numBalls > 0)
@@ -360,14 +450,52 @@ namespace game
 
                 spriteBatch.Begin();
 
-                string winText = golfCourse.IsLastMap() ? "Congratulations! You've completed all maps!" : "Hole Complete!";
-                XNAVector2 textSize = font.MeasureString(winText);
-                XNAVector2 position = new XNAVector2(
-                    GraphicsDevice.Viewport.Width / 2 - textSize.X / 2,
-                    GraphicsDevice.Viewport.Height / 2 - textSize.Y / 2
-                );
+                if (isPromptingForInitials)
+                {
+                    string prompt = "Enter your initials:";
+                    string currentInput = currentInitials;
+                    string instructions = "Press ENTER when done";
+                    
+                    XNAVector2 promptSize = font.MeasureString(prompt);
+                    XNAVector2 inputSize = font.MeasureString(currentInput);
+                    XNAVector2 instructionsSize = smallFont.MeasureString(instructions);
+                    
+                    float centerX = GraphicsDevice.Viewport.Width / 2;
+                    float startY = GraphicsDevice.Viewport.Height / 2 - 50;
 
-                DrawTextWithOutline(winText, position, Color.Green);
+                    DrawTextWithOutline(prompt, 
+                        new XNAVector2(centerX - promptSize.X / 2, startY), 
+                        Color.Black);
+                        
+                    DrawTextWithOutline(currentInput + "_", 
+                        new XNAVector2(centerX - inputSize.X / 2, startY + 50), 
+                        Color.Black);
+                        
+                    spriteBatch.DrawString(smallFont, instructions,
+                        new XNAVector2(centerX - instructionsSize.X / 2, startY + 100),
+                        Color.Black);
+                }
+                else
+                {
+                    string winText;
+                    if (golfCourse.IsLastMap()) 
+                    {
+                        winText = $"Congratulations! You've completed all maps!\nTotal Strokes: {totalStrokes}";
+                    }
+                    else 
+                    {
+                        winText = "Hole Complete!";
+                    }
+                    
+                    XNAVector2 textSize = font.MeasureString(winText);
+                    XNAVector2 position = new XNAVector2(
+                        GraphicsDevice.Viewport.Width / 2 - textSize.X / 2,
+                        GraphicsDevice.Viewport.Height / 2 - textSize.Y / 2
+                    );
+
+                    DrawTextWithOutline(winText, position, Color.Green);
+                }
+
                 spriteBatch.End();
             }
         }

@@ -106,6 +106,13 @@ namespace game
                 hasWon = true;
                 DeleteBall();
                 transitionTimer = transDelay;
+                
+                Game.OnHoleComplete(); // Update total strokes
+                
+                if (golfCourse.IsLastMap())
+                {
+                    Game.PromptForInitials(); // Now prompt for initials after strokes are updated
+                }
             }
             else if (other == golfCourse.CourseMesh)
             {
@@ -133,7 +140,10 @@ namespace game
                     camera.isOrbiting = false;
                     golfCourse.LoadNextMap(camera);
                     Game.numBalls = 0;
-                    Game.numStrokes = 0;
+                    if (!golfCourse.IsLastMap()) 
+                    {
+                        Game.numStrokes = 0;
+                    }
                     isTransitioningMap = false;
                     hasWon = false;
                     transitionTimer = 0f;
