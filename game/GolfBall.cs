@@ -100,20 +100,18 @@ namespace game
 
         private void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
         {
-            if (other == golfCourse.HoleMesh && !isTransitioningMap)
+            if (other == golfCourse.HoleMesh && ballEntity != null)
             {
                 Game.HoleSound.Play();
-                isTransitioningMap = true;
                 hasWon = true;
                 DeleteBall();
-                transitionTimer = transDelay;
                 
-                Game.OnHoleComplete(); // Update total strokes
+                // Notify game of hole completion, but let GolfCourse handle the transition
+                Game.OnHoleComplete();
                 
-                if (golfCourse.IsLastMap())
-                {
-                    Game.PromptForInitials(); // Now prompt for initials after strokes are updated
-                }
+                // Signal to the course that a ball entered the hole
+                // This will only start the transition when both players have finished
+                golfCourse.BallEnteredHole();
             }
             else if (other == golfCourse.CourseMesh)
             {
@@ -133,25 +131,6 @@ namespace game
 
         public void Update(float dt)
         {
-            if (isTransitioningMap)
-            {
-                transitionTimer -= dt;
-                if (transitionTimer <= 0)
-                {
-                    camera.isOrbiting = false;
-                    golfCourse.LoadNextMap(camera);
-                    Game.numBalls = 0;
-                    if (!golfCourse.IsLastMap()) 
-                    {
-                        Game.numStrokes = 0;
-                    }
-                    isTransitioningMap = false;
-                    hasWon = false;
-                    transitionTimer = 0f;
-                }
-                return;
-            }
-
             if (ballEntity != null && camera.isOrbiting)
             {
                 KeyboardState keyState = Keyboard.GetState();
@@ -267,6 +246,12 @@ namespace game
             {
                 trajectoryLine.Draw();
             }
+        }
+
+        // Public method to reset the won state
+        public void ResetWonState()
+        {
+            hasWon = false;
         }
     }
 }

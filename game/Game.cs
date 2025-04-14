@@ -175,8 +175,8 @@ namespace game
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = (int)1920 / 2;
-            graphics.PreferredBackBufferHeight = (int)1080 / 2;
+            graphics.PreferredBackBufferWidth = (int)1280;
+            graphics.PreferredBackBufferHeight = (int)720;
             Content.RootDirectory = "Content";
         }
 
@@ -269,14 +269,12 @@ namespace game
                 {
                     player1FinishedHole = true;
                     
-                    // If player 2 hasn't finished, switch to them
                     if (!player2FinishedHole)
                     {
                         SwitchToPlayer(2);
                     }
                     else
                     {
-                        // Both players have finished the hole
                         player1TotalStrokes += player1Strokes;
                         player2TotalStrokes += player2Strokes;
                         player1Strokes = 0;
@@ -476,6 +474,12 @@ namespace game
                 }
 
                 space.Update();
+                
+                // Update golf course to handle map transitions
+                if (golfCourse != null)
+                {
+                    golfCourse.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                }
             }
 
             // Store the current keyboard state for the next frame
@@ -609,7 +613,7 @@ namespace game
                 // Current player indicator
                 XNAVector2 turnSize = font.MeasureString(currentPlayerText);
                 XNAVector2 turnPos = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - turnSize.X / 2, 10);
-                DrawTextWithOutline(currentPlayerText, turnPos, Color.Blue);
+                DrawTextWithOutline(currentPlayerText, turnPos, Color.Black);
                 
                 // Draw ball placement instruction at the bottom if needed
                 bool needsToPlaceBall = (currentPlayer == 1 && !player1PlacedBall) || 
@@ -621,7 +625,7 @@ namespace game
                     XNAVector2 placementPos = new XNAVector2(
                         GraphicsDevice.Viewport.Width / 2 - placementSize.X / 2,
                         GraphicsDevice.Viewport.Height - 50);
-                    DrawTextWithOutline(placementText, placementPos, Color.Orange);
+                    DrawTextWithOutline(placementText, placementPos, Color.Black);
                 }
                 else if (canSwitchPlayer && Camera.isOrbiting) {
                     string switchText = "Press ENTER to end your turn";
@@ -629,7 +633,7 @@ namespace game
                     XNAVector2 switchPos = new XNAVector2(
                         GraphicsDevice.Viewport.Width / 2 - switchSize.X / 2,
                         GraphicsDevice.Viewport.Height - 50);
-                    DrawTextWithOutline(switchText, switchPos, Color.Yellow);
+                    DrawTextWithOutline(switchText, switchPos, Color.Black);
                 }
             }
             else
@@ -748,6 +752,38 @@ namespace game
                 }
 
                 spriteBatch.End();
+            }
+        }
+
+        public void ResetPlayersForNewHole()
+        {
+            // Reset player state variables
+            player1FinishedHole = false;
+            player2FinishedHole = false;
+            player1PlacedBall = false;
+            player2PlacedBall = false;
+            
+            // Reset the hasWon property on both golf balls
+            if (player1Ball != null)
+            {
+                player1Ball.ResetWonState();
+            }
+            
+            if (player2Ball != null)
+            {
+                player2Ball.ResetWonState();
+            }
+            
+            // Reset the active ball's hasWon state
+            if (golfBall != null)
+            {
+                golfBall.ResetWonState();
+            }
+            
+            // If in two player mode, explicitly switch back to player 1
+            if (isTwoPlayerMode)
+            {
+                SwitchToPlayer(1);
             }
         }
     }

@@ -19,11 +19,16 @@ namespace game
         public StaticMesh HoleMesh { get; private set; }
         public StaticMesh CourseMesh { get; private set; }
         private int currentMap = 0;
+        private bool isTransitioning = false;
+        private float transitionTimer = 0f;
+        private const float TRANSITION_DELAY = 2.0f;
+        private Camera camera;
 
         public GolfCourse(Game game, Space space)
         {
             Game = game;
             this.space = space;
+            this.camera = game.Camera; // Store the camera reference
             courseMaps = new Model[] { game.Map1, game.Map2 };
             teeAreaMaps = new Model[] { game.Map1teearea, game.Map2teearea };
             holeMaps = new Model[] { game.Map1hole, game.Map2hole };
@@ -51,6 +56,13 @@ namespace game
             UnloadCurrentMap();
             LoadMap(currentMap);
             camera.Position = cameraPositions[currentMap];
+            
+            ResetPlayerStateForNewHole();
+        }
+        
+        private void ResetPlayerStateForNewHole()
+        {
+            Game.ResetPlayersForNewHole();
         }
 
         private void UnloadCurrentMap()
@@ -131,6 +143,48 @@ namespace game
             HoleMesh.Material = holeMaterial;
             space.Add(HoleMesh);
             Game.Components.Add(new StaticModel(holeMaps[mapIndex], HoleMesh.WorldTransform.Matrix, Game));
+        }
+
+        public void BallEnteredHole()
+        {
+            // In two-player mode, only start the transition when both players have finished
+            if (!isTransitioning && !IsLastMap())
+            {
+                if (!Game.isTwoPlayerMode || (Game.player1FinishedHole && Game.player2FinishedHole))
+                {
+                    isTransitioning = true;
+                    transitionTimer = TRANSITION_DELAY;
+                }
+            }
+        }
+
+        public void Update(float dt)
+        {
+            // Check if both players have finished the hole (for delayed transition start)
+            if (!isTransitioning && !IsLastMap() && Game.isTwoPlayerMode && 
+                Game.player1FinishedHole && Game.player2FinishedHole)
+            {
+                isTransitioning = true;
+                transitionTimer = TRANSITION_DELAY;
+            }
+            
+            // Handle map transition if in progress
+            if (isTransitioning)
+            {
+                transitionTimer -= dt;
+                if (transitionTimer <= 0)
+                {
+                    // Transition to next map
+                    camera.isOrbiting = false;
+                    LoadNextMap(camera);
+                    Game.numBalls = 0;
+                    if (!IsLastMap())
+                    {
+                        Game.numStrokes = 0;
+                    }
+                    isTransitioning = false;
+                }
+            }
         }
     }
 }
