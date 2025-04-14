@@ -76,13 +76,39 @@ namespace game
         {
             try
             {
+                // Ensure directory exists
                 string directory = Path.GetDirectoryName(SCORES_FILE);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
-                
-                File.AppendAllText(SCORES_FILE, $"{currentInitials}:{totalStrokes}\n");
+
+                // Read existing scores
+                List<(string initials, int strokes)> scores = new List<(string, int)>();
+                if (File.Exists(SCORES_FILE))
+                {
+                    foreach (string line in File.ReadAllLines(SCORES_FILE))
+                    {
+                        string[] parts = line.Split(':');
+                        if (parts.Length == 2 && int.TryParse(parts[1], out int strokes))
+                        {
+                            scores.Add((parts[0], strokes));
+                        }
+                    }
+                }
+
+                // Add current score
+                scores.Add((currentInitials, totalStrokes));
+
+                // Sort by strokes (ascending, since lower is better in golf)
+                scores = scores.OrderBy(s => s.strokes).ToList();
+
+                // Keep only top 3
+                scores = scores.Take(3).ToList();
+
+                // Write back to file
+                File.WriteAllLines(SCORES_FILE, 
+                    scores.Select(s => $"{s.initials}:{s.strokes}"));
             }
             catch (Exception e)
             {
@@ -194,6 +220,7 @@ namespace game
         public void OnHoleComplete()
         {
             totalStrokes += numStrokes;
+            numStrokes = 0;
         }
 
         void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
