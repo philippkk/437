@@ -96,6 +96,11 @@ namespace game
         private string currentInitials = "";
         private const string SCORES_FILE = "highscores.txt";
 
+        // Variables for initials collection in two-player mode
+        private bool isPlayer1InitialsCollected = false;
+        private bool isPlayer2InitialsCollected = false;
+        private int initialsCollectionPlayer = 1; // Which player's initials we're currently collecting
+
         private void SaveHighScore()
         {
             try
@@ -119,10 +124,26 @@ namespace game
                     }
                 }
 
-                scores.Add((currentInitials, totalStrokes));
+                if (isTwoPlayerMode && golfCourse.IsLastMap())
+                {
+                    // In two-player mode on the final hole, add both players' scores separately
+                    scores.Add((player1Initials, player1TotalStrokes));
+                    scores.Add((player2Initials, player2TotalStrokes));
+                    
+                    string combinedInitials = player1Initials.Substring(0, Math.Min(1, player1Initials.Length)) + 
+                                             player2Initials.Substring(0, Math.Min(1, player2Initials.Length));
+                    if (combinedInitials.Length < 2)
+                        combinedInitials = combinedInitials.PadRight(2, 'X');
+                    
+                    scores.Add((combinedInitials + "T", totalStrokes)); /
+                }
+                else
+                {
+                    // Single player mode
+                    scores.Add((currentInitials, totalStrokes));
+                }
 
                 scores = scores.OrderBy(s => s.strokes).ToList();
-
                 scores = scores.Take(3).ToList();
 
                 File.WriteAllLines(SCORES_FILE, 
@@ -148,10 +169,74 @@ namespace game
             }
             else if (key == Keys.Enter && currentInitials.Length > 0)
             {
-                SaveHighScore();
-                isPromptingForInitials = false;
-                currentInitials = "";
-                isInGame = false;
+                if (isTwoPlayerMode && golfCourse.IsLastMap())
+                {
+                    // In two-player mode on the final hole, store initials for the current player
+                    if (initialsCollectionPlayer == 1)
+                    {
+                        // Store Player 1's initials
+                        player1Initials = currentInitials;
+                        isPlayer1InitialsCollected = true;
+                        isPromptingForInitials = false;
+                        currentInitials = "";
+                        
+                        // If Player 2 has already finished, save their scores;
+                        // otherwise switch to Player 2 to continue playing
+                        if (player2FinishedHole && isPlayer2InitialsCollected)
+                        {
+                            // Both players finished and entered initials
+                            SaveHighScore();
+                            isInGame = false;
+                        }
+                        else if (player2FinishedHole)
+                        {
+                            // Player 2 finished but hasn't entered initials
+                            initialsCollectionPlayer = 2;
+                            PromptForInitials();
+                        }
+                        else
+                        {
+                            // Player 2 hasn't finished yet, switch to their turn
+                            SwitchToPlayer(2);
+                        }
+                    }
+                    else if (initialsCollectionPlayer == 2)
+                    {
+                        // Store Player 2's initials
+                        player2Initials = currentInitials;
+                        isPlayer2InitialsCollected = true;
+                        isPromptingForInitials = false;
+                        currentInitials = "";
+                        
+                        // If Player 1 has already finished, save their scores;
+                        // otherwise switch to Player 1 to continue playing
+                        if (player1FinishedHole && isPlayer1InitialsCollected)
+                        {
+                            // Both players finished and entered initials
+                            SaveHighScore();
+                            isInGame = false;
+                        }
+                        else if (player1FinishedHole)
+                        {
+                            // Player 1 finished but hasn't entered initials
+                            initialsCollectionPlayer = 1;
+                            PromptForInitials();
+                        }
+                        else
+                        {
+                            // Player 1 hasn't finished yet, switch to their turn
+                            SwitchToPlayer(1);
+                        }
+                    }
+                }
+                else
+                {
+                    // Single player mode or not the last hole
+                    SaveHighScore();
+                    isPromptingForInitials = false;
+                    currentInitials = "";
+                    isInGame = false;
+                }
             }
         }
 
@@ -233,6 +318,11 @@ namespace game
                 player2Initials = "";
                 promptingForPlayer2Initials = false;
                 
+                // Reset initials collection state
+                isPlayer1InitialsCollected = false;
+                isPlayer2InitialsCollected = false;
+                initialsCollectionPlayer = 1;
+                
                 space = new Space();
                 space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
 
@@ -269,8 +359,16 @@ namespace game
                 {
                     player1FinishedHole = true;
                     
-                    if (!player2FinishedHole)
+                    // If this is the final map, prompt player 1 for initials immediately
+                    if (golfCourse.IsLastMap())
                     {
+                        initialsCollectionPlayer = 1;
+                        isPlayer1InitialsCollected = false; // Ensure we're prompting
+                        PromptForInitials();
+                    }
+                    else if (!player2FinishedHole)
+                    {
+                        // Only switch to player 2 if not prompting for initials
                         SwitchToPlayer(2);
                     }
                     else
@@ -286,9 +384,16 @@ namespace game
                 {
                     player2FinishedHole = true;
                     
-                    // If player 1 hasn't finished, switch to them
-                    if (!player1FinishedHole)
+                    // If this is the final map, prompt player 2 for initials immediately
+                    if (golfCourse.IsLastMap()) 
                     {
+                        initialsCollectionPlayer = 2;
+                        isPlayer2InitialsCollected = false; // Ensure we're prompting
+                        PromptForInitials();
+                    }
+                    else if (!player1FinishedHole)
+                    {
+                        // Only switch to player 1 if not prompting for initials
                         SwitchToPlayer(1);
                     }
                     else
@@ -398,13 +503,31 @@ namespace game
             }
             else
             {
-                // Update win text timer
+                // Update win text timer when a player completes the final hole
                 if (golfBall != null && golfBall.HasWon && golfCourse.IsLastMap())
                 {
                     winTextTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
                     if (winTextTimer >= WIN_TEXT_DURATION)
                     {
-                        PromptForInitials();
+                        if (isTwoPlayerMode)
+                        {
+                            // In two-player mode, handle initials collection based on current player
+                            if (currentPlayer == 1 && !isPlayer1InitialsCollected)
+                            {
+                                initialsCollectionPlayer = 1;
+                                PromptForInitials();
+                            }
+                            else if (currentPlayer == 2 && !isPlayer2InitialsCollected)
+                            {
+                                initialsCollectionPlayer = 2;
+                                PromptForInitials();
+                            }
+                        }
+                        else
+                        {
+                            // Single player mode
+                            PromptForInitials();
+                        }
                         winTextTimer = 0f;
                     }
                 }
@@ -707,7 +830,8 @@ namespace game
 
                 if (isPromptingForInitials)
                 {
-                    string prompt = "Enter your initials:";
+                    string playerIndicator = isTwoPlayerMode ? $"Player {initialsCollectionPlayer} - " : "";
+                    string prompt = $"{playerIndicator}Enter your initials:";
                     string currentInput = currentInitials;
                     string instructions = "Press ENTER when done";
                     
@@ -729,13 +853,41 @@ namespace game
                     spriteBatch.DrawString(smallFont, instructions,
                         new XNAVector2(centerX - instructionsSize.X / 2, startY + 100),
                         Color.Black);
+
+                    // Display score information
+                    if (isTwoPlayerMode && golfCourse.IsLastMap())
+                    {
+                        string scoreText = $"Final Score: {(initialsCollectionPlayer == 1 ? player1Strokes : player2Strokes)} strokes";
+                        XNAVector2 scoreSize = smallFont.MeasureString(scoreText);
+                        spriteBatch.DrawString(smallFont, scoreText,
+                            new XNAVector2(centerX - scoreSize.X / 2, startY + 130),
+                            Color.Black);
+                    }
                 }
                 else
                 {
                     string winText;
                     if (golfCourse.IsLastMap()) 
                     {
-                        winText = $"Congratulations! You've completed all maps!\nTotal Strokes: {totalStrokes}";
+                        if (isTwoPlayerMode)
+                        {
+                            if (player1FinishedHole && player2FinishedHole)
+                            {
+                                // Both players finished the final hole
+                                winText = $"Congratulations! You've completed all maps!\nPlayer 1: {player1TotalStrokes} strokes\nPlayer 2: {player2TotalStrokes} strokes\nTotal: {totalStrokes} strokes";
+                            }
+                            else
+                            {
+                                // Only one player finished
+                                string playerName = currentPlayer == 1 ? "Player 1" : "Player 2";
+                                winText = $"{playerName} completed the course!\n{(currentPlayer == 1 ? "Player 2" : "Player 1")} still needs to finish.";
+                            }
+                        }
+                        else
+                        {
+                            // Single player mode
+                            winText = $"Congratulations! You've completed all maps!\nTotal Strokes: {totalStrokes}";
+                        }
                     }
                     else 
                     {
