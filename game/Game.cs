@@ -29,10 +29,14 @@ using System.Linq;
     x main menu
     x add help on bottom right (tab and menu controlls)
     x other maps
-    - keeping top three scores
-      - keep for each map and have initials too
+    x keeping top three scores
+    x keep for each map and have initials too
     - two player mode
         - logic for stopping a ball when too low speed to swap players
+        steps:
+            add main menu button,
+            add second player stats and ball
+            add logic to swap players between shots 
     x sounds
 */
 
@@ -53,6 +57,9 @@ namespace game
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
+        private GolfBall player1Ball;
+        private GolfBall player2Ball;
+        private GolfBall activeBall;
         public GolfCourse golfCourse { get; private set; }
         private SpriteBatch spriteBatch;
         private SpriteFont font;
@@ -66,6 +73,23 @@ namespace game
         public int numStrokes = 0;
         public int totalStrokes = 0;
 
+        // Two-player mode variables
+        public bool isTwoPlayerMode { get; private set; } = false;
+        public int currentPlayer { get; private set; } = 1; // 1 or 2
+        public int player1Strokes = 0;
+        public int player1TotalStrokes = 0;
+        public int player2Strokes = 0;
+        public int player2TotalStrokes = 0;
+        public bool player1FinishedHole = false;
+        public bool player2FinishedHole = false;
+        private string player1Initials = "";
+        private string player2Initials = "";
+        private bool promptingForPlayer2Initials = false;
+        public bool player1PlacedBall = false;
+        public bool player2PlacedBall = false;
+        private bool canSwitchPlayer = false;
+        private KeyboardState lastKeyboardState;
+
         private MenuScreen menuScreen;
         public bool isInGame { get; private set; } = false;
         public bool isPromptingForInitials { get; private set; } = false;
@@ -76,14 +100,12 @@ namespace game
         {
             try
             {
-                // Ensure directory exists
                 string directory = Path.GetDirectoryName(SCORES_FILE);
                 if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
 
-                // Read existing scores
                 List<(string initials, int strokes)> scores = new List<(string, int)>();
                 if (File.Exists(SCORES_FILE))
                 {
@@ -97,16 +119,12 @@ namespace game
                     }
                 }
 
-                // Add current score
                 scores.Add((currentInitials, totalStrokes));
 
-                // Sort by strokes (ascending, since lower is better in golf)
                 scores = scores.OrderBy(s => s.strokes).ToList();
 
-                // Keep only top 3
                 scores = scores.Take(3).ToList();
 
-                // Write back to file
                 File.WriteAllLines(SCORES_FILE, 
                     scores.Select(s => $"{s.initials}:{s.strokes}"));
             }
@@ -194,10 +212,27 @@ namespace game
             powerBarTexture.SetData(new[] { Color.White });
         }
 
-        public void StartGame()
+        public void StartGame(bool twoPlayerMode = false)
         {
             if (!isInGame)
             {
+                // Set game mode
+                isTwoPlayerMode = twoPlayerMode;
+                currentPlayer = 1;
+                
+                // Reset player states
+                player1Strokes = 0;
+                player1TotalStrokes = 0;
+                player2Strokes = 0;
+                player2TotalStrokes = 0;
+                player1FinishedHole = false;
+                player2FinishedHole = false;
+                player1PlacedBall = false;
+                player2PlacedBall = false;
+                player1Initials = "";
+                player2Initials = "";
+                promptingForPlayer2Initials = false;
+                
                 space = new Space();
                 space.ForceUpdater.Gravity = new Vector3(0, -30.00f, 0);
 
@@ -208,7 +243,16 @@ namespace game
                 golfCourse = new GolfCourse(this, space);
                 golfCourse.LoadCourse();
 
-                golfBall = new GolfBall(this, Camera, space);
+                // Initialize golf balls
+                player1Ball = new GolfBall(this, Camera, space);
+                
+                if (isTwoPlayerMode) {
+                    player2Ball = new GolfBall(this, Camera, space);
+                }
+                
+                // Set active ball to player 1
+                activeBall = player1Ball;
+                golfBall = activeBall; // Keep compatibility with existing code
 
                 isInGame = true;
                 totalStrokes = 0; 
@@ -219,8 +263,97 @@ namespace game
 
         public void OnHoleComplete()
         {
-            totalStrokes += numStrokes;
-            numStrokes = 0;
+            if (isTwoPlayerMode)
+            {
+                if (currentPlayer == 1)
+                {
+                    player1FinishedHole = true;
+                    
+                    // If player 2 hasn't finished, switch to them
+                    if (!player2FinishedHole)
+                    {
+                        SwitchToPlayer(2);
+                    }
+                    else
+                    {
+                        // Both players have finished the hole
+                        player1TotalStrokes += player1Strokes;
+                        player2TotalStrokes += player2Strokes;
+                        player1Strokes = 0;
+                        player2Strokes = 0;
+                        totalStrokes = player1TotalStrokes + player2TotalStrokes;
+                    }
+                }
+                else // player 2
+                {
+                    player2FinishedHole = true;
+                    
+                    // If player 1 hasn't finished, switch to them
+                    if (!player1FinishedHole)
+                    {
+                        SwitchToPlayer(1);
+                    }
+                    else
+                    {
+                        // Both players have finished the hole
+                        player1TotalStrokes += player1Strokes;
+                        player2TotalStrokes += player2Strokes;
+                        player1Strokes = 0;
+                        player2Strokes = 0;
+                        totalStrokes = player1TotalStrokes + player2TotalStrokes;
+                    }
+                }
+            }
+            else
+            {
+                totalStrokes += numStrokes;
+                numStrokes = 0;
+            }
+        }
+
+        private void SwitchToPlayer(int playerNumber)
+        {
+            if (!isTwoPlayerMode || (playerNumber != 1 && playerNumber != 2))
+                return;
+
+            // Update current player
+            currentPlayer = playerNumber;
+
+            // Set the active ball based on the current player
+            if (currentPlayer == 1)
+            {
+                activeBall = player1Ball;
+                golfBall = player1Ball;  // Keep compatibility with existing code
+            }
+            else
+            {
+                activeBall = player2Ball;
+                golfBall = player2Ball;  // Keep compatibility with existing code
+            }
+
+            // Reset camera position if player hasn't placed a ball yet
+            bool hasPlacedBall = (currentPlayer == 1) ? player1PlacedBall : player2PlacedBall;
+            
+            if (hasPlacedBall && activeBall.BallEntity != null)
+            {
+                // Player has already placed a ball, move camera to it
+                Camera.isOrbiting = false;
+                Camera.Position = new Vector3(
+                    activeBall.BallEntity.Position.X - 2,
+                    activeBall.BallEntity.Position.Y + 1.5f,
+                    activeBall.BallEntity.Position.Z - 2
+                );
+                Camera.SetTarget(activeBall.BallEntity);
+            }
+            else
+            {
+                // Player needs to place a ball, reset camera to starting position
+                Camera.isOrbiting = false;
+                Camera.Position = new Vector3(-17, 11, -18);
+                
+                // Ensure we count this as a new ball placement opportunity
+                numBalls = 0;
+            }
         }
 
         void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
@@ -243,10 +376,12 @@ namespace game
         private const float WIN_TEXT_DURATION = 4.0f; // 4 seconds before switching to initials prompt
         protected override void Update(GameTime gameTime)
         {
-            KeyboardState = Keyboard.GetState();
+            // Store keyboard state in both the local variable and the public field
+            KeyboardState currentKeyboardState = Keyboard.GetState();
+            KeyboardState = currentKeyboardState;  // Update the public field so other code can access it
             MouseState = Mouse.GetState();
 
-            if (KeyboardState.IsKeyDown(Keys.Escape))
+            if (currentKeyboardState.IsKeyDown(Keys.Escape))
             {
                 Exit();
                 return;
@@ -255,6 +390,7 @@ namespace game
             if (isPromptingForInitials)
             {
                 menuScreen.Update();
+                lastKeyboardState = currentKeyboardState;
                 return;
             }
 
@@ -275,7 +411,7 @@ namespace game
                     }
                 }
 
-                if (KeyboardState.IsKeyDown(Keys.R))
+                if (currentKeyboardState.IsKeyDown(Keys.R))
                 {
                     if (numBalls > 0)
                     {
@@ -291,12 +427,46 @@ namespace game
                 if (Camera.isOrbiting)
                 {
                     golfBall.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
+                    
+                    // In two player mode, check if the player has taken a shot and can switch players
+                    if (isTwoPlayerMode && !golfBall.IsCharging && !golfBall.HasWon)
+                    {
+                        // Allow player switching if they've placed their ball and taken at least one shot
+                        bool playerHasTakenShot = (currentPlayer == 1 && player1PlacedBall && player1Strokes > 0) ||
+                                               (currentPlayer == 2 && player2PlacedBall && player2Strokes > 0);
+                        
+                        // Allow switching anytime after a shot, regardless of ball speed or camera state
+                        canSwitchPlayer = playerHasTakenShot;
+                        
+                        // Handle Enter key press to switch players
+                        if (currentKeyboardState.IsKeyDown(Keys.Enter) && lastKeyboardState.IsKeyUp(Keys.Enter) && canSwitchPlayer)
+                        {
+                            // Switch to other player after a shot
+                            if (currentPlayer == 1 && !player1FinishedHole)
+                            {
+                                SwitchToPlayer(2);
+                            }
+                            else if (currentPlayer == 2 && !player2FinishedHole)
+                            {
+                                SwitchToPlayer(1);
+                            }
+                        }
+                    }
                 }
                 else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
                 {
                     clicking = true;
                     if (golfBall.SpawnBall()){
                         numBalls++;
+                        
+                        // Set the ball placed flag for the current player
+                        if (isTwoPlayerMode) {
+                            if (currentPlayer == 1) {
+                                player1PlacedBall = true;
+                            } else {
+                                player2PlacedBall = true;
+                            }
+                        }
                     }
                 }
 
@@ -307,6 +477,9 @@ namespace game
 
                 space.Update();
             }
+
+            // Store the current keyboard state for the next frame
+            lastKeyboardState = currentKeyboardState;
 
             base.Update(gameTime);
         }
@@ -413,10 +586,61 @@ namespace game
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend,
                             SamplerState.PointClamp, null, null, null, null);
-            string strokeText = $"Strokes: {numStrokes}";
-            XNAVector2 textSize = font.MeasureString(strokeText);
-            XNAVector2 position = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - textSize.X / 2, 10);
-            DrawTextWithOutline(strokeText, position, Color.Black);
+
+            if (isTwoPlayerMode)
+            {
+                // Display both players' scores and indicate current player
+                string player1Text = $"Player 1: {player1Strokes}";
+                string player2Text = $"Player 2: {player2Strokes}";
+                string currentPlayerText = $"Player {currentPlayer}'s Turn";
+                
+                // Player 1 score
+                XNAVector2 player1Size = font.MeasureString(player1Text);
+                XNAVector2 player1Pos = new XNAVector2(20, 10);
+                Color player1Color = currentPlayer == 1 ? Color.Green : Color.Black;
+                DrawTextWithOutline(player1Text, player1Pos, player1Color);
+                
+                // Player 2 score
+                XNAVector2 player2Size = font.MeasureString(player2Text);
+                XNAVector2 player2Pos = new XNAVector2(GraphicsDevice.Viewport.Width - player2Size.X - 20, 10);
+                Color player2Color = currentPlayer == 2 ? Color.Green : Color.Black;
+                DrawTextWithOutline(player2Text, player2Pos, player2Color);
+                
+                // Current player indicator
+                XNAVector2 turnSize = font.MeasureString(currentPlayerText);
+                XNAVector2 turnPos = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - turnSize.X / 2, 10);
+                DrawTextWithOutline(currentPlayerText, turnPos, Color.Blue);
+                
+                // Draw ball placement instruction at the bottom if needed
+                bool needsToPlaceBall = (currentPlayer == 1 && !player1PlacedBall) || 
+                                      (currentPlayer == 2 && !player2PlacedBall);
+                
+                if (needsToPlaceBall && !Camera.isOrbiting) {
+                    string placementText = "Click on tee area to place ball";
+                    XNAVector2 placementSize = font.MeasureString(placementText);
+                    XNAVector2 placementPos = new XNAVector2(
+                        GraphicsDevice.Viewport.Width / 2 - placementSize.X / 2,
+                        GraphicsDevice.Viewport.Height - 50);
+                    DrawTextWithOutline(placementText, placementPos, Color.Orange);
+                }
+                else if (canSwitchPlayer && Camera.isOrbiting) {
+                    string switchText = "Press ENTER to end your turn";
+                    XNAVector2 switchSize = font.MeasureString(switchText);
+                    XNAVector2 switchPos = new XNAVector2(
+                        GraphicsDevice.Viewport.Width / 2 - switchSize.X / 2,
+                        GraphicsDevice.Viewport.Height - 50);
+                    DrawTextWithOutline(switchText, switchPos, Color.Yellow);
+                }
+            }
+            else
+            {
+                // Original single player display
+                string strokeText = $"Strokes: {numStrokes}";
+                XNAVector2 textSize = font.MeasureString(strokeText);
+                XNAVector2 position = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - textSize.X / 2, 10);
+                DrawTextWithOutline(strokeText, position, Color.Black);
+            }
+            
             spriteBatch.End();
         }
         void drawControls()

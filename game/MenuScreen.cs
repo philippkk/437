@@ -12,7 +12,7 @@ namespace game
         private SpriteBatch spriteBatch;
         private SpriteFont font;
         private SpriteFont smallFont;
-        private string[] menuItems = { "Start Game", "Top Scores", "Exit" };
+        private string[] menuItems = { "Single Player", "Two Players", "Top Scores", "Exit" };
         private int selectedIndex = 0;
         private KeyboardState lastKeyboardState;
         private bool showingScores = false;
@@ -70,13 +70,16 @@ namespace game
             {
                 switch (selectedIndex)
                 {
-                    case 0: // Start Game
-                        game.StartGame();
+                    case 0: // Single Player
+                        game.StartGame(false);
                         break;
-                    case 1: // Top Scores
+                    case 1: // Two Players
+                        game.StartGame(true);
+                        break;
+                    case 2: // Top Scores
                         showingScores = true;
                         break;
-                    case 2: // Exit
+                    case 3: // Exit
                         game.Exit();
                         break;
                 }

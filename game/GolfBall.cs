@@ -45,6 +45,7 @@ namespace game
         public float CurrentPowerPercent => currentChargeTime / chargeTime;
         public float CurrentAngle => currentAngle;
         public bool HasWon => hasWon;
+        public Sphere BallEntity => ballEntity; // Public accessor for ballEntity
 
         public GolfBall(Game game, Camera camera, Space space)
         {
@@ -195,7 +196,22 @@ namespace game
                     shootSound.Play();
                     isCharging = false;
                     currentChargeTime = 0f;
-                    Game.numStrokes++;
+                    
+                    // Only count stroke if this player has already placed their ball
+                    if (!Game.isTwoPlayerMode)
+                    {
+                        Game.numStrokes++;
+                    }
+                    else if (Game.currentPlayer == 1 && Game.player1PlacedBall)
+                    {
+                        Game.player1Strokes++;
+                        Game.numStrokes++;
+                    }
+                    else if (Game.currentPlayer == 2 && Game.player2PlacedBall)
+                    {
+                        Game.player2Strokes++;
+                        Game.numStrokes++;
+                    }
                 }
             }
         }
