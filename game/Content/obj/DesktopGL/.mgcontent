@@ -7,21 +7,25 @@
     <File>/Users/philipking/Desktop/437/game/Content/../../models/golfball2.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/../../models/golfball3.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/Arial.spritefont</File>
+    <File>/Users/philipking/Desktop/437/game/Content/ArialSmall.spritefont</File>
+    <File>/Users/philipking/Desktop/437/game/Content/click.wav</File>
     <File>/Users/philipking/Desktop/437/game/Content/cube.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/golfball.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/map1.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/map1hole.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/map1teearea.fbx</File>
+    <File>/Users/philipking/Desktop/437/game/Content/map2.fbx</File>
+    <File>/Users/philipking/Desktop/437/game/Content/map2hole.fbx</File>
+    <File>/Users/philipking/Desktop/437/game/Content/map2teearea.fbx</File>
     <File>/Users/philipking/Desktop/437/game/Content/metal.jpg</File>
     <File>/Users/philipking/Desktop/437/game/Content/pallet1.png</File>
-    <File>/Users/philipking/Desktop/437/game/Content/playground.fbx</File>
-    <File>/Users/philipking/Desktop/437/game/Content/Screenshot 2025-02-24 at 1.20.14 PM.png</File>
-    <File>/Users/philipking/Desktop/437/game/Content/Ship2.fbx</File>
-    <File>/Users/philipking/Desktop/437/game/Content/thing.fbx</File>
+    <File>/Users/philipking/Desktop/437/game/Content/powerUp.wav</File>
   </SourceFiles>
   <DestFiles>
     <File>golfball2.fbx</File>
     <File>golfball3.fbx</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

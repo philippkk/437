@@ -5,6 +5,7 @@ using BEPUutilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using BEPUphysics.Entities;
 using BEPUphysics;
 using BEPUphysics.NarrowPhaseSystems.Pairs;
@@ -24,9 +25,11 @@ using System.Runtime.InteropServices;
     x gui, done
     x main menu
     x add help on bottom right (tab and menu controlls)
-    - other maps
+    x other maps
     - keeping top three scores
-    - two player mod
+    - keep for each map and have initials too
+    - two player mode
+        - logic for stopping a ball when too low speed to swap players
     - sounds
 */
 
@@ -41,6 +44,9 @@ namespace game
         public Model Map1;
         public Model Map1teearea;
         public Model Map1hole;
+        public Model Map2;
+        public Model Map2teearea;
+        public Model Map2hole;
         public KeyboardState KeyboardState;
         public MouseState MouseState;
         private GolfBall golfBall;
@@ -50,6 +56,8 @@ namespace game
         private SpriteFont smallFont;  
         private Texture2D crosshairTexture;
         private Texture2D powerBarTexture;
+        public SoundEffect ShootSound { get; private set; }
+        public SoundEffect HoleSound { get; private set; }
 
         public int numBalls = 0;
         public int numStrokes = 0;
@@ -84,6 +92,11 @@ namespace game
             Map1 = Content.Load<Model>("map1");
             Map1teearea = Content.Load<Model>("map1teearea");
             Map1hole = Content.Load<Model>("map1hole");
+            Map2 = Content.Load<Model>("map2");
+            Map2teearea = Content.Load<Model>("map2teearea");
+            Map2hole = Content.Load<Model>("map2hole");
+            ShootSound = Content.Load<SoundEffect>("click");
+            HoleSound = Content.Load<SoundEffect>("powerUp");
 
             crosshairTexture = new Texture2D(GraphicsDevice, 1, 1);
             crosshairTexture.SetData(new[] { Color.Black });
@@ -150,6 +163,7 @@ namespace game
                     if (numBalls > 0)
                     {
                         Camera.isOrbiting = false;
+                        Camera.Position = new Vector3(-17, 11, -18);
                         golfBall.DeleteBall();
                         numBalls = 0;
                     }
@@ -164,8 +178,9 @@ namespace game
                 else if (numBalls < 1 && MouseState.LeftButton == ButtonState.Pressed && (!clicking || KeyboardState.IsKeyDown(Keys.LeftShift)))
                 {
                     clicking = true;
-                    golfBall.SpawnBall();
-                    numBalls++;
+                    if (golfBall.SpawnBall()){
+                        numBalls++;
+                    }
                 }
 
                 if (MouseState.LeftButton == ButtonState.Released)
@@ -345,7 +360,7 @@ namespace game
 
                 spriteBatch.Begin();
 
-                string winText = "U WIN";
+                string winText = golfCourse.IsLastMap() ? "Congratulations! You've completed all maps!" : "Hole Complete!";
                 XNAVector2 textSize = font.MeasureString(winText);
                 XNAVector2 position = new XNAVector2(
                     GraphicsDevice.Viewport.Width / 2 - textSize.X / 2,

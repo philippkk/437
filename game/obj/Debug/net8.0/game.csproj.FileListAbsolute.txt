@@ -32,10 +32,7 @@
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/ConversionHelper.xml
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/playground.fbx.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal.xnb
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/metal_0.xnb
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Ship2.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/cube.xnb
-/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/playground.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/thing.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Screenshot 2025-02-24 at 1.20.14 PM.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/Screenshot 2025-02-24 at 1.20.14 PM_0.xnb
@@ -49,3 +46,8 @@
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map1teearea.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map1hole.xnb
 /Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/ArialSmall.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map2.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map2hole.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/map2teearea.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/click.xnb
+/Users/philipking/Desktop/437/game/bin/Debug/net8.0/Content/powerUp.xnb

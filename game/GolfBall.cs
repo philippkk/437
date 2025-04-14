@@ -1,5 +1,6 @@
 using BEPUutilities;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using Microsoft.Xna.Framework.Graphics;
 using BEPUphysics;
@@ -23,8 +24,9 @@ namespace game
         private Sphere ballEntity;
         private GolfCourse golfCourse;
         private TrajectoryLine trajectoryLine;
+        private SoundEffect shootSound;
         private const float minForce = 10f;
-        private const float maxForce = 40f;
+        private const float maxForce = 65f;
         private const float chargeTime = 3.0f;
         private const float angleChangeRate = 45f;
         private const float minAngle = 0f;
@@ -34,7 +36,10 @@ namespace game
         private bool isCharging = false;
         private bool powerIncreasing = true;
         private float currentAngle = 45f;
+        private float transitionTimer = 0f;
+        private const float transDelay = 2.0f; 
         private bool hasWon = false;
+        private bool isTransitioningMap = false;
 
         public bool IsCharging => isCharging;
         public float CurrentPowerPercent => currentChargeTime / chargeTime;
@@ -48,6 +53,7 @@ namespace game
             this.space = space;
             this.golfCourse = game.golfCourse;
             Model = game.GolfBallModel;
+            shootSound = game.ShootSound;
             trajectoryLine = new TrajectoryLine(game);
         }
 
@@ -65,13 +71,14 @@ namespace game
                 Vector3 spawnPosition = rayStart + rayDirection * raycastResult.HitData.T + new Vector3(0, 1, 0);
 
                 ballEntity = new Sphere(spawnPosition, 1, 1);
+                ballEntity.LinearDamping = 0.3f; 
                 camera.SetTarget(ballEntity);
 
                 Material mat = new Material
                 {
-                    Bounciness = 1.0f,
-                    KineticFriction = 1f,
-                    StaticFriction = 1f
+                    Bounciness = 0.5f,
+                    KineticFriction = 1.5f,
+                    StaticFriction = 2f
                 };
                 ballEntity.Material = mat;
 
@@ -92,9 +99,17 @@ namespace game
 
         private void HandleCollision(EntityCollidable sender, Collidable other, CollidablePairHandler pair)
         {
-            if (other == golfCourse.HoleMesh)
+            if (other == golfCourse.HoleMesh && !isTransitioningMap)
             {
+                Game.HoleSound.Play();
+                isTransitioningMap = true;
                 hasWon = true;
+                DeleteBall();
+                transitionTimer = transDelay;
+            }
+            else if (other == golfCourse.CourseMesh)
+            {
+                shootSound.Play();
             }
         }
 
@@ -110,6 +125,22 @@ namespace game
 
         public void Update(float dt)
         {
+            if (isTransitioningMap)
+            {
+                transitionTimer -= dt;
+                if (transitionTimer <= 0)
+                {
+                    camera.isOrbiting = false;
+                    golfCourse.LoadNextMap(camera);
+                    Game.numBalls = 0;
+                    Game.numStrokes = 0;
+                    isTransitioningMap = false;
+                    hasWon = false;
+                    transitionTimer = 0f;
+                }
+                return;
+            }
+
             if (ballEntity != null && camera.isOrbiting)
             {
                 KeyboardState keyState = Keyboard.GetState();
@@ -151,6 +182,7 @@ namespace game
                     Vector3 adjustedDirection = getAdjustedDirection();
                     ballEntity.LinearVelocity = adjustedDirection * finalForce;
 
+                    shootSound.Play();
                     isCharging = false;
                     currentChargeTime = 0f;
                     Game.numStrokes++;
