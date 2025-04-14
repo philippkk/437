@@ -84,7 +84,6 @@ namespace game
         public bool player2FinishedHole = false;
         private string player1Initials = "";
         private string player2Initials = "";
-        private bool promptingForPlayer2Initials = false;
         public bool player1PlacedBall = false;
         public bool player2PlacedBall = false;
         private bool canSwitchPlayer = false;
@@ -96,11 +95,9 @@ namespace game
         private string currentInitials = "";
         private const string SCORES_FILE = "highscores.txt";
 
-        // Variables for initials collection in two-player mode
         private bool isPlayer1InitialsCollected = false;
         private bool isPlayer2InitialsCollected = false;
-        private int initialsCollectionPlayer = 1; // Which player's initials we're currently collecting
-
+        private int initialsCollectionPlayer = 1; 
         private void SaveHighScore()
         {
             try
@@ -126,7 +123,6 @@ namespace game
 
                 if (isTwoPlayerMode && golfCourse.IsLastMap())
                 {
-                    // In two-player mode on the final hole, add both players' scores separately
                     scores.Add((player1Initials, player1TotalStrokes));
                     scores.Add((player2Initials, player2TotalStrokes));
                     
@@ -135,11 +131,10 @@ namespace game
                     if (combinedInitials.Length < 2)
                         combinedInitials = combinedInitials.PadRight(2, 'X');
                     
-                    scores.Add((combinedInitials + "T", totalStrokes)); /
+                    scores.Add((combinedInitials + "T", totalStrokes)); 
                 }
                 else
                 {
-                    // Single player mode
                     scores.Add((currentInitials, totalStrokes));
                 }
 
@@ -171,67 +166,53 @@ namespace game
             {
                 if (isTwoPlayerMode && golfCourse.IsLastMap())
                 {
-                    // In two-player mode on the final hole, store initials for the current player
                     if (initialsCollectionPlayer == 1)
                     {
-                        // Store Player 1's initials
                         player1Initials = currentInitials;
                         isPlayer1InitialsCollected = true;
                         isPromptingForInitials = false;
                         currentInitials = "";
                         
-                        // If Player 2 has already finished, save their scores;
-                        // otherwise switch to Player 2 to continue playing
                         if (player2FinishedHole && isPlayer2InitialsCollected)
                         {
-                            // Both players finished and entered initials
                             SaveHighScore();
                             isInGame = false;
                         }
                         else if (player2FinishedHole)
                         {
-                            // Player 2 finished but hasn't entered initials
                             initialsCollectionPlayer = 2;
                             PromptForInitials();
                         }
                         else
                         {
-                            // Player 2 hasn't finished yet, switch to their turn
                             SwitchToPlayer(2);
                         }
                     }
                     else if (initialsCollectionPlayer == 2)
                     {
-                        // Store Player 2's initials
                         player2Initials = currentInitials;
                         isPlayer2InitialsCollected = true;
                         isPromptingForInitials = false;
                         currentInitials = "";
                         
-                        // If Player 1 has already finished, save their scores;
-                        // otherwise switch to Player 1 to continue playing
                         if (player1FinishedHole && isPlayer1InitialsCollected)
                         {
-                            // Both players finished and entered initials
                             SaveHighScore();
                             isInGame = false;
                         }
                         else if (player1FinishedHole)
                         {
-                            // Player 1 finished but hasn't entered initials
                             initialsCollectionPlayer = 1;
                             PromptForInitials();
                         }
                         else
                         {
-                            // Player 1 hasn't finished yet, switch to their turn
                             SwitchToPlayer(1);
                         }
                     }
                 }
                 else
                 {
-                    // Single player mode or not the last hole
                     SaveHighScore();
                     isPromptingForInitials = false;
                     currentInitials = "";
@@ -301,11 +282,9 @@ namespace game
         {
             if (!isInGame)
             {
-                // Set game mode
                 isTwoPlayerMode = twoPlayerMode;
                 currentPlayer = 1;
                 
-                // Reset player states
                 player1Strokes = 0;
                 player1TotalStrokes = 0;
                 player2Strokes = 0;
@@ -316,9 +295,8 @@ namespace game
                 player2PlacedBall = false;
                 player1Initials = "";
                 player2Initials = "";
-                promptingForPlayer2Initials = false;
                 
-                // Reset initials collection state
+                // Reset initials cddollection state
                 isPlayer1InitialsCollected = false;
                 isPlayer2InitialsCollected = false;
                 initialsCollectionPlayer = 1;
@@ -333,16 +311,14 @@ namespace game
                 golfCourse = new GolfCourse(this, space);
                 golfCourse.LoadCourse();
 
-                // Initialize golf balls
                 player1Ball = new GolfBall(this, Camera, space);
                 
                 if (isTwoPlayerMode) {
                     player2Ball = new GolfBall(this, Camera, space);
                 }
                 
-                // Set active ball to player 1
                 activeBall = player1Ball;
-                golfBall = activeBall; // Keep compatibility with existing code
+                golfBall = activeBall; 
 
                 isInGame = true;
                 totalStrokes = 0; 
@@ -359,16 +335,14 @@ namespace game
                 {
                     player1FinishedHole = true;
                     
-                    // If this is the final map, prompt player 1 for initials immediately
                     if (golfCourse.IsLastMap())
                     {
                         initialsCollectionPlayer = 1;
-                        isPlayer1InitialsCollected = false; // Ensure we're prompting
+                        isPlayer1InitialsCollected = false; 
                         PromptForInitials();
                     }
                     else if (!player2FinishedHole)
                     {
-                        // Only switch to player 2 if not prompting for initials
                         SwitchToPlayer(2);
                     }
                     else
@@ -380,25 +354,22 @@ namespace game
                         totalStrokes = player1TotalStrokes + player2TotalStrokes;
                     }
                 }
-                else // player 2
+                else 
                 {
                     player2FinishedHole = true;
                     
-                    // If this is the final map, prompt player 2 for initials immediately
                     if (golfCourse.IsLastMap()) 
                     {
                         initialsCollectionPlayer = 2;
-                        isPlayer2InitialsCollected = false; // Ensure we're prompting
+                        isPlayer2InitialsCollected = false;
                         PromptForInitials();
                     }
                     else if (!player1FinishedHole)
                     {
-                        // Only switch to player 1 if not prompting for initials
                         SwitchToPlayer(1);
                     }
                     else
                     {
-                        // Both players have finished the hole
                         player1TotalStrokes += player1Strokes;
                         player2TotalStrokes += player2Strokes;
                         player1Strokes = 0;
@@ -419,27 +390,23 @@ namespace game
             if (!isTwoPlayerMode || (playerNumber != 1 && playerNumber != 2))
                 return;
 
-            // Update current player
             currentPlayer = playerNumber;
 
-            // Set the active ball based on the current player
             if (currentPlayer == 1)
             {
                 activeBall = player1Ball;
-                golfBall = player1Ball;  // Keep compatibility with existing code
+                golfBall = player1Ball; 
             }
             else
             {
                 activeBall = player2Ball;
-                golfBall = player2Ball;  // Keep compatibility with existing code
+                golfBall = player2Ball;  
             }
 
-            // Reset camera position if player hasn't placed a ball yet
             bool hasPlacedBall = (currentPlayer == 1) ? player1PlacedBall : player2PlacedBall;
             
             if (hasPlacedBall && activeBall.BallEntity != null)
             {
-                // Player has already placed a ball, move camera to it
                 Camera.isOrbiting = false;
                 Camera.Position = new Vector3(
                     activeBall.BallEntity.Position.X - 2,
@@ -450,11 +417,9 @@ namespace game
             }
             else
             {
-                // Player needs to place a ball, reset camera to starting position
                 Camera.isOrbiting = false;
                 Camera.Position = new Vector3(-17, 11, -18);
                 
-                // Ensure we count this as a new ball placement opportunity
                 numBalls = 0;
             }
         }
@@ -476,12 +441,11 @@ namespace game
 
         bool clicking = false;
         private float winTextTimer = 0f;
-        private const float WIN_TEXT_DURATION = 4.0f; // 4 seconds before switching to initials prompt
+        private const float WIN_TEXT_DURATION = 4.0f; 
         protected override void Update(GameTime gameTime)
         {
-            // Store keyboard state in both the local variable and the public field
             KeyboardState currentKeyboardState = Keyboard.GetState();
-            KeyboardState = currentKeyboardState;  // Update the public field so other code can access it
+            KeyboardState = currentKeyboardState;  
             MouseState = Mouse.GetState();
 
             if (currentKeyboardState.IsKeyDown(Keys.Escape))
@@ -503,7 +467,6 @@ namespace game
             }
             else
             {
-                // Update win text timer when a player completes the final hole
                 if (golfBall != null && golfBall.HasWon && golfCourse.IsLastMap())
                 {
                     winTextTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -511,7 +474,6 @@ namespace game
                     {
                         if (isTwoPlayerMode)
                         {
-                            // In two-player mode, handle initials collection based on current player
                             if (currentPlayer == 1 && !isPlayer1InitialsCollected)
                             {
                                 initialsCollectionPlayer = 1;
@@ -525,7 +487,6 @@ namespace game
                         }
                         else
                         {
-                            // Single player mode
                             PromptForInitials();
                         }
                         winTextTimer = 0f;
@@ -549,20 +510,15 @@ namespace game
                 {
                     golfBall.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                     
-                    // In two player mode, check if the player has taken a shot and can switch players
                     if (isTwoPlayerMode && !golfBall.IsCharging && !golfBall.HasWon)
                     {
-                        // Allow player switching if they've placed their ball and taken at least one shot
                         bool playerHasTakenShot = (currentPlayer == 1 && player1PlacedBall && player1Strokes > 0) ||
                                                (currentPlayer == 2 && player2PlacedBall && player2Strokes > 0);
                         
-                        // Allow switching anytime after a shot, regardless of ball speed or camera state
                         canSwitchPlayer = playerHasTakenShot;
                         
-                        // Handle Enter key press to switch players
                         if (currentKeyboardState.IsKeyDown(Keys.Enter) && lastKeyboardState.IsKeyUp(Keys.Enter) && canSwitchPlayer)
                         {
-                            // Switch to other player after a shot
                             if (currentPlayer == 1 && !player1FinishedHole)
                             {
                                 SwitchToPlayer(2);
@@ -580,7 +536,6 @@ namespace game
                     if (golfBall.SpawnBall()){
                         numBalls++;
                         
-                        // Set the ball placed flag for the current player
                         if (isTwoPlayerMode) {
                             if (currentPlayer == 1) {
                                 player1PlacedBall = true;
@@ -598,14 +553,12 @@ namespace game
 
                 space.Update();
                 
-                // Update golf course to handle map transitions
                 if (golfCourse != null)
                 {
                     golfCourse.Update((float)gameTime.ElapsedGameTime.TotalSeconds);
                 }
             }
 
-            // Store the current keyboard state for the next frame
             lastKeyboardState = currentKeyboardState;
 
             base.Update(gameTime);
@@ -716,29 +669,24 @@ namespace game
 
             if (isTwoPlayerMode)
             {
-                // Display both players' scores and indicate current player
                 string player1Text = $"Player 1: {player1Strokes}";
                 string player2Text = $"Player 2: {player2Strokes}";
                 string currentPlayerText = $"Player {currentPlayer}'s Turn";
                 
-                // Player 1 score
                 XNAVector2 player1Size = font.MeasureString(player1Text);
                 XNAVector2 player1Pos = new XNAVector2(20, 10);
                 Color player1Color = currentPlayer == 1 ? Color.Green : Color.Black;
                 DrawTextWithOutline(player1Text, player1Pos, player1Color);
                 
-                // Player 2 score
                 XNAVector2 player2Size = font.MeasureString(player2Text);
                 XNAVector2 player2Pos = new XNAVector2(GraphicsDevice.Viewport.Width - player2Size.X - 20, 10);
                 Color player2Color = currentPlayer == 2 ? Color.Green : Color.Black;
                 DrawTextWithOutline(player2Text, player2Pos, player2Color);
                 
-                // Current player indicator
                 XNAVector2 turnSize = font.MeasureString(currentPlayerText);
                 XNAVector2 turnPos = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - turnSize.X / 2, 10);
                 DrawTextWithOutline(currentPlayerText, turnPos, Color.Black);
                 
-                // Draw ball placement instruction at the bottom if needed
                 bool needsToPlaceBall = (currentPlayer == 1 && !player1PlacedBall) || 
                                       (currentPlayer == 2 && !player2PlacedBall);
                 
@@ -761,7 +709,6 @@ namespace game
             }
             else
             {
-                // Original single player display
                 string strokeText = $"Strokes: {numStrokes}";
                 XNAVector2 textSize = font.MeasureString(strokeText);
                 XNAVector2 position = new XNAVector2(GraphicsDevice.Viewport.Width / 2 - textSize.X / 2, 10);
@@ -854,7 +801,6 @@ namespace game
                         new XNAVector2(centerX - instructionsSize.X / 2, startY + 100),
                         Color.Black);
 
-                    // Display score information
                     if (isTwoPlayerMode && golfCourse.IsLastMap())
                     {
                         string scoreText = $"Final Score: {(initialsCollectionPlayer == 1 ? player1Strokes : player2Strokes)} strokes";
@@ -873,19 +819,16 @@ namespace game
                         {
                             if (player1FinishedHole && player2FinishedHole)
                             {
-                                // Both players finished the final hole
                                 winText = $"Congratulations! You've completed all maps!\nPlayer 1: {player1TotalStrokes} strokes\nPlayer 2: {player2TotalStrokes} strokes\nTotal: {totalStrokes} strokes";
                             }
                             else
                             {
-                                // Only one player finished
                                 string playerName = currentPlayer == 1 ? "Player 1" : "Player 2";
                                 winText = $"{playerName} completed the course!\n{(currentPlayer == 1 ? "Player 2" : "Player 1")} still needs to finish.";
                             }
                         }
                         else
                         {
-                            // Single player mode
                             winText = $"Congratulations! You've completed all maps!\nTotal Strokes: {totalStrokes}";
                         }
                     }
@@ -902,20 +845,17 @@ namespace game
 
                     DrawTextWithOutline(winText, position, Color.Green);
                 }
-
                 spriteBatch.End();
             }
         }
 
         public void ResetPlayersForNewHole()
         {
-            // Reset player state variables
             player1FinishedHole = false;
             player2FinishedHole = false;
             player1PlacedBall = false;
             player2PlacedBall = false;
             
-            // Reset the hasWon property on both golf balls
             if (player1Ball != null)
             {
                 player1Ball.ResetWonState();
@@ -926,13 +866,11 @@ namespace game
                 player2Ball.ResetWonState();
             }
             
-            // Reset the active ball's hasWon state
             if (golfBall != null)
             {
                 golfBall.ResetWonState();
             }
             
-            // If in two player mode, explicitly switch back to player 1
             if (isTwoPlayerMode)
             {
                 SwitchToPlayer(1);

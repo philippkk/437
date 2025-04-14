@@ -28,7 +28,7 @@ namespace game
         {
             Game = game;
             this.space = space;
-            this.camera = game.Camera; // Store the camera reference
+            this.camera = game.Camera; 
             courseMaps = new Model[] { game.Map1, game.Map2 };
             teeAreaMaps = new Model[] { game.Map1teearea, game.Map2teearea };
             holeMaps = new Model[] { game.Map1hole, game.Map2hole };
@@ -147,7 +147,6 @@ namespace game
 
         public void BallEnteredHole()
         {
-            // In two-player mode, only start the transition when both players have finished
             if (!isTransitioning && !IsLastMap())
             {
                 if (!Game.isTwoPlayerMode || (Game.player1FinishedHole && Game.player2FinishedHole))
@@ -160,7 +159,6 @@ namespace game
 
         public void Update(float dt)
         {
-            // Check if both players have finished the hole (for delayed transition start)
             if (!isTransitioning && !IsLastMap() && Game.isTwoPlayerMode && 
                 Game.player1FinishedHole && Game.player2FinishedHole)
             {
@@ -168,13 +166,11 @@ namespace game
                 transitionTimer = TRANSITION_DELAY;
             }
             
-            // Handle map transition if in progress
             if (isTransitioning)
             {
                 transitionTimer -= dt;
                 if (transitionTimer <= 0)
                 {
-                    // Transition to next map
                     camera.isOrbiting = false;
                     LoadNextMap(camera);
                     Game.numBalls = 0;

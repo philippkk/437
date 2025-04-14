@@ -36,16 +36,13 @@ namespace game
         private bool isCharging = false;
         private bool powerIncreasing = true;
         private float currentAngle = 45f;
-        private float transitionTimer = 0f;
         private const float transDelay = 2.0f; 
         private bool hasWon = false;
-        private bool isTransitioningMap = false;
-
         public bool IsCharging => isCharging;
         public float CurrentPowerPercent => currentChargeTime / chargeTime;
         public float CurrentAngle => currentAngle;
         public bool HasWon => hasWon;
-        public Sphere BallEntity => ballEntity; // Public accessor for ballEntity
+        public Sphere BallEntity => ballEntity;
 
         public GolfBall(Game game, Camera camera, Space space)
         {
@@ -106,11 +103,8 @@ namespace game
                 hasWon = true;
                 DeleteBall();
                 
-                // Notify game of hole completion, but let GolfCourse handle the transition
                 Game.OnHoleComplete();
                 
-                // Signal to the course that a ball entered the hole
-                // This will only start the transition when both players have finished
                 golfCourse.BallEnteredHole();
             }
             else if (other == golfCourse.CourseMesh)
@@ -176,7 +170,6 @@ namespace game
                     isCharging = false;
                     currentChargeTime = 0f;
                     
-                    // Only count stroke if this player has already placed their ball
                     if (!Game.isTwoPlayerMode)
                     {
                         Game.numStrokes++;
@@ -248,7 +241,6 @@ namespace game
             }
         }
 
-        // Public method to reset the won state
         public void ResetWonState()
         {
             hasWon = false;
