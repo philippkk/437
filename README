@@ -20,3 +20,28 @@ update:
 actually just stay on x64 dotnet and it seems to just work idk
 
 hi prof and/or ta :)
+Heres what yall should know,
+This golf project *should* meet every requirement as stated in the doc I will run through every single one of them after an explaination of how to play
+### how to play
+In the main menu, use the arrow keys and enter to select the option youd like
+at any time press esc to close the game
+
+#### how to actually play the game
+when in the game, by default the camera will be in floating mode. WASD and Q/E to move
+in order to shoot the ball, use the mouse to click on the tee area to place the ball, then press f to orbit the ball with the camera, then hold left mouse to choose the power to shoot at.
+use Q/E to change the angle of the shot.
+Two player mode is similar with the addtion of pressing enter to swap turns (be careful lol)
+
+### actual implementation
+1. there are two holes with the required implementation, for how they are loaded and unloaded see GolfCourse.cs
+2. Click on the tee area to place your ball!
+3. wide range of angles and power as seen by the ocillating power and angle decieded by look direction
+4. yup
+5. orbit and free mode 
+6. total strokes 1 player and 2 player are maintained
+7. sounds!
+8. it is 3d, the blend file is even in the models folder
+9. bepu 1
+10. two player mode was so hard to make.
+11. sure does! saves top three to a text file and maintains it
+12. its messy but gets the idea across :)
