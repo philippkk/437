@@ -103,9 +103,9 @@ namespace game
 
             Material courseMaterial = new Material
             {
-                Bounciness = 0.3f,
-                KineticFriction = 1f,
-                StaticFriction = 1f
+                Bounciness = 0.6f,
+                KineticFriction = 0.5f,
+                StaticFriction = 0.5f
             };
 
             CourseMesh.Material = courseMaterial;

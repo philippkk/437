@@ -31,8 +31,8 @@ using System.Linq;
     x other maps
     x keeping top three scores
     x keep for each map and have initials too
-    - two player mode
-        - logic for stopping a ball when too low speed to swap players
+    x two player mode
+        x logic for stopping a ball when too low speed to swap players
         steps:
             add main menu button,
             add second player stats and ball
@@ -73,9 +73,8 @@ namespace game
         public int numStrokes = 0;
         public int totalStrokes = 0;
 
-        // Two-player mode variables
         public bool isTwoPlayerMode { get; private set; } = false;
-        public int currentPlayer { get; private set; } = 1; // 1 or 2
+        public int currentPlayer { get; private set; } = 1; 
         public int player1Strokes = 0;
         public int player1TotalStrokes = 0;
         public int player2Strokes = 0;
@@ -125,13 +124,6 @@ namespace game
                 {
                     scores.Add((player1Initials, player1TotalStrokes));
                     scores.Add((player2Initials, player2TotalStrokes));
-                    
-                    string combinedInitials = player1Initials.Substring(0, Math.Min(1, player1Initials.Length)) + 
-                                             player2Initials.Substring(0, Math.Min(1, player2Initials.Length));
-                    if (combinedInitials.Length < 2)
-                        combinedInitials = combinedInitials.PadRight(2, 'X');
-                    
-                    scores.Add((combinedInitials + "T", totalStrokes)); 
                 }
                 else
                 {
@@ -296,7 +288,6 @@ namespace game
                 player1Initials = "";
                 player2Initials = "";
                 
-                // Reset initials cddollection state
                 isPlayer1InitialsCollected = false;
                 isPlayer2InitialsCollected = false;
                 initialsCollectionPlayer = 1;
@@ -334,6 +325,7 @@ namespace game
                 if (currentPlayer == 1)
                 {
                     player1FinishedHole = true;
+                    player1TotalStrokes += player1Strokes;
                     
                     if (golfCourse.IsLastMap())
                     {
@@ -347,7 +339,6 @@ namespace game
                     }
                     else
                     {
-                        player1TotalStrokes += player1Strokes;
                         player2TotalStrokes += player2Strokes;
                         player1Strokes = 0;
                         player2Strokes = 0;
@@ -357,6 +348,7 @@ namespace game
                 else 
                 {
                     player2FinishedHole = true;
+                    player2TotalStrokes += player2Strokes;
                     
                     if (golfCourse.IsLastMap()) 
                     {
@@ -371,7 +363,6 @@ namespace game
                     else
                     {
                         player1TotalStrokes += player1Strokes;
-                        player2TotalStrokes += player2Strokes;
                         player1Strokes = 0;
                         player2Strokes = 0;
                         totalStrokes = player1TotalStrokes + player2TotalStrokes;
@@ -803,7 +794,7 @@ namespace game
 
                     if (isTwoPlayerMode && golfCourse.IsLastMap())
                     {
-                        string scoreText = $"Final Score: {(initialsCollectionPlayer == 1 ? player1Strokes : player2Strokes)} strokes";
+                        string scoreText = $"Final Score: {(initialsCollectionPlayer == 1 ? player1TotalStrokes : player2TotalStrokes)} strokes";
                         XNAVector2 scoreSize = smallFont.MeasureString(scoreText);
                         spriteBatch.DrawString(smallFont, scoreText,
                             new XNAVector2(centerX - scoreSize.X / 2, startY + 130),

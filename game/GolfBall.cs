@@ -177,12 +177,10 @@ namespace game
                     else if (Game.currentPlayer == 1 && Game.player1PlacedBall)
                     {
                         Game.player1Strokes++;
-                        Game.numStrokes++;
                     }
                     else if (Game.currentPlayer == 2 && Game.player2PlacedBall)
                     {
                         Game.player2Strokes++;
-                        Game.numStrokes++;
                     }
                 }
             }
