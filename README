@@ -22,6 +22,11 @@ actually just stay on x64 dotnet and it seems to just work idk
 hi prof and/or ta :)
 Heres what yall should know,
 This golf project *should* meet every requirement as stated in the doc I will run through every single one of them after an explaination of how to play
+
+I will also note, doing this on mac its been wack, I am running an x64 version of dotnet on my arm machine
+this means I have to use dotnet run to actually run my game and dont have auto complete or anything while making this.
+I am very interested to hear if this just works on yalls machine.
+
 ### how to play
 In the main menu, use the arrow keys and enter to select the option youd like
 at any time press esc to close the game
